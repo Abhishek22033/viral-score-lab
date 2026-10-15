@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Viral Score Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a two-pane lab bench — the post on the left, the meter readout on the right; stacks on phones. */
+:root {
+  --bg: #F3F4F7;
+  --panel: #FFFFFF;
+  --ink: #14182B;
+  --muted: #5C6380;
+  --line: #DADDE8;
+  --accent: #2B3FE0;
+  --accent-soft: #E6E9FD;
+  --hot: #E5482E;
+  --good: #14895A;
+  --warn: #B87503;
+  --bad: #C4313B;
+  --meter-track: #E7E9F1;
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --body: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E1020; --panel: #171A2E; --ink: #ECEEF8; --muted: #9AA0BF; --line: #2A2F4A;
+    --accent: #8C9BFF; --accent-soft: #232A55; --hot: #FF7A5C; --good: #4CC98F; --warn: #F0B54A; --bad: #FF6B74;
+    --meter-track: #262B45; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E1020; --panel: #171A2E; --ink: #ECEEF8; --muted: #9AA0BF; --line: #2A2F4A;
+  --accent: #8C9BFF; --accent-soft: #232A55; --hot: #FF7A5C; --good: #4CC98F; --warn: #F0B54A; --bad: #FF6B74;
+  --meter-track: #262B45; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 48px;
+}
+.wrap { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+header.top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px; }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(28px, 5vw, 42px); line-height: 1; margin: 0; letter-spacing: -0.02em; text-wrap: balance; }
+h1 .dot { color: var(--hot); }
+.sub { color: var(--muted); margin: 6px 0 0; max-width: 60ch; }
+.tabs { display: inline-flex; background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 4px; gap: 4px; }
+.tabs button { border: 0; background: transparent; color: var(--muted); font: 600 14px var(--body); padding: 8px 16px; border-radius: 999px; cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.bench { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 860px) { .bench { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.panel h2 { font-family: var(--display); font-weight: 700; font-size: 19px; margin: 0; }
+.eyebrow { font: 600 11px var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+label.f { display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: 13px; min-width: 0; }
+label.f small { font-weight: 400; color: var(--muted); }
+input, textarea, select {
+  font: 400 15px var(--body); color: var(--ink); background: var(--bg); border: 1px solid var(--line);
+  border-radius: 10px; padding: 10px 12px; width: 100%; min-width: 0;
+}
+textarea { resize: vertical; min-height: 84px; }
+input[type="number"] { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.count { font: 400 12px var(--mono); color: var(--muted); align-self: flex-end; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 999px; padding: 6px 12px; font: 600 13px var(--body); cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+:root[data-theme="dark"] .chip[aria-pressed="true"] { color: #0E1020; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .chip[aria-pressed="true"] { color: #0E1020; } }
+.example-tag { font: 600 11px var(--mono); color: var(--warn); border: 1px dashed var(--warn); border-radius: 6px; padding: 2px 8px; align-self: flex-start; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.btn { border: 0; border-radius: 10px; padding: 12px 18px; font: 600 15px var(--body); cursor: pointer; background: var(--accent); color: #fff; }
+:root[data-theme="dark"] .btn { color: #0E1020; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn { color: #0E1020; } }
+.btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.btn:disabled { opacity: 0.55; cursor: progress; }
+.note { color: var(--muted); font-size: 13px; }
+
+/* Meter readout */
+.readout { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); }
+@media (max-width: 860px) { .readout { position: static; } }
+.dial { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.dial svg { width: 150px; height: 150px; flex: none; max-width: 100%; }
+.dial .big { font-family: var(--display); font-weight: 800; font-size: 44px; fill: var(--ink); }
+.dial .small { font: 400 11px var(--mono); fill: var(--muted); letter-spacing: 0.08em; }
+.verdict { font-family: var(--display); font-weight: 700; font-size: 22px; line-height: 1.15; margin: 0; text-wrap: balance; }
+.verdict-sub { color: var(--muted); margin: 4px 0 0; }
+.bars { display: flex; flex-direction: column; gap: 12px; }
+.bar { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; }
+.bar .name { font-weight: 600; font-size: 14px; }
+.bar .pts { font: 600 13px var(--mono); font-variant-numeric: tabular-nums; color: var(--muted); }
+.bar .track { grid-column: 1 / -1; height: 8px; border-radius: 99px; background: var(--meter-track); overflow: hidden; }
+.bar .fill { height: 100%; border-radius: 99px; transition: width 0.4s ease; }
+.tips { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.tips li { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 8px; font-size: 14px; }
+.tips li::before { content: ""; width: 8px; height: 8px; border-radius: 50%; margin-top: 7px; background: var(--c, var(--muted)); }
+.tips li.fix { --c: var(--hot); }
+.tips li.ok { --c: var(--good); }
+hr.rule { border: 0; border-top: 1px solid var(--line); margin: 0; width: 100%; }
+
+/* AI section */
+.ai-out { display: flex; flex-direction: column; gap: 14px; }
+.ai-out h3 { font-family: var(--display); font-size: 16px; margin: 0; }
+.hook-alt { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: start; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+.hook-alt p { margin: 0; font-weight: 600; }
+.hook-alt span { display: block; font: 400 12px var(--mono); color: var(--muted); margin-top: 2px; }
+.copy { border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 8px; font: 600 12px var(--body); padding: 6px 10px; cursor: pointer; }
+.pre { white-space: pre-wrap; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 12px; font-size: 14px; overflow-wrap: anywhere; }
+.status { font: 400 13px var(--mono); color: var(--muted); }
+.status.err { color: var(--bad); }
+
+/* Stats tab */
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.kpi { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; background: var(--bg); }
+.kpi .v { font: 600 24px var(--mono); font-variant-numeric: tabular-nums; }
+.kpi .k { font-size: 13px; color: var(--muted); }
+.pill { align-self: flex-start; font: 600 11px var(--mono); letter-spacing: 0.04em; text-transform: uppercase; padding: 3px 8px; border-radius: 99px; color: var(--c); border: 1px solid var(--c); }
+.pill.good { --c: var(--good); } .pill.warn { --c: var(--warn); } .pill.bad { --c: var(--bad); } .pill.hot { --c: var(--hot); }
+.history { display: flex; flex-direction: column; gap: 8px; }
+.hist-item { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; gap: 12px; align-items: center; border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; background: var(--bg); cursor: pointer; text-align: left; color: var(--ink); font: inherit; width: 100%; }
+.hist-item b { font: 700 18px var(--mono); }
+.hist-item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hist-item em { font-style: normal; font: 400 12px var(--mono); color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { .bar .fill { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Viral Score Lab<span class="dot">.</span></h1>
+      <p class="sub">Score a post before you publish it, or diagnose one after it's live. Works for Reels, Shorts, TikTok, X and LinkedIn.</p>
+    </div>
+    <div class="tabs" role="tablist">
+      <button role="tab" id="tab-pre" aria-selected="true" aria-controls="view-pre">Before posting</button>
+      <button role="tab" id="tab-post" aria-selected="false" aria-controls="view-post">After posting</button>
+    </div>
+  </header>
+
+  <!-- BEFORE POSTING -->
+  <section id="view-pre" class="bench" role="tabpanel" aria-labelledby="tab-pre">
+    <div class="panel">
+      <div class="actions" style="justify-content:space-between">
+        <h2>Your post</h2>
+        <span class="example-tag" id="exampleTag">Example post — replace with yours</span>
+      </div>
+      <div>
+        <div class="eyebrow" style="margin-bottom:8px">Platform</div>
+        <div class="chips" id="platforms"></div>
+      </div>
+      <div class="row">
+        <label class="f">Niche <small>e.g. cars, mythology, AI tools</small>
+          <input id="niche" type="text">
+        </label>
+        <label class="f">Length (seconds) <small>for video; 0 for text/image</small>
+          <input id="seconds" type="number" min="0" max="600">
+        </label>
+      </div>
+      <label class="f">Hook <small>The first line spoken or shown in the first 2 seconds</small>
+        <input id="hook" type="text">
+        <span class="count" id="hookCount"></span>
+      </label>
+      <label class="f">On-screen text <small>The big text over the first frame</small>
+        <input id="onscreen" type="text">
+      </label>
+      <label class="f">Script or body
+        <textarea id="script" rows="6"></textarea>
+        <span class="count" id="scriptCount"></span>
+      </label>
+      <label class="f">Caption
+        <textarea id="caption" rows="4"></textarea>
+        <span class="count" id="captionCount"></span>
+      </label>
+      <label class="f">Hashtags <small>space separated</small>
+        <input id="tags" type="text">
+      </label>
+      <label class="f" id="thumbWrap" hidden>Cover or thumbnail <small>optional — Claude looks at it in the deep analysis</small>
+        <input id="thumb" type="file" accept="image/*">
+      </label>
+      <div class="actions">
+        <button class="btn" id="deepBtn">Deep analysis with Claude</button>
+        <button class="btn ghost" id="saveBtn">Save to history</button>
+        <button class="btn ghost" id="clearBtn">Clear</button>
+      </div>
+      <p class="note" id="aiNote">The score on the right updates as you type. Deep analysis uses your own Claude account and asks your permission the first time.</p>
+    </div>
+
+    <div class="panel readout" aria-live="polite">
+      <div class="dial">
+        <svg viewBox="0 0 150 150" role="img" aria-label="Viral score">
+          <circle cx="75" cy="75" r="62" fill="none" stroke="var(--meter-track)" stroke-width="12"/>
+          <circle id="arc" cx="75" cy="75" r="62" fill="none" stroke="var(--accent)" stroke-width="12" stroke-linecap="round"
+            transform="rotate(-90 75 75)" stroke-dasharray="389.6" stroke-dashoffset="389.6"/>
+          <text id="scoreNum" class="big" x="75" y="82" text-anchor="middle">0</text>
+          <text class="small" x="75" y="104" text-anchor="middle">OF 100</text>
+        </svg>
+        <div style="min-width:0;flex:1">
+          <div class="eyebrow">Quick score</div>
+          <p class="verdict" id="verdict">—</p>
+          <p class="verdict-sub" id="verdictSub"></p>
+        </div>
+      </div>
+      <div class="bars" id="bars"></div>
+      <hr class="rule">
+      <div>
+        <div class="eyebrow" style="margin-bottom:8px">Fix first</div>
+        <ul class="tips" id="tips"></ul>
+      </div>
+      <div class="ai-out" id="aiOut" hidden>
+        <hr class="rule">
+        <div class="actions" style="justify-content:space-between">
+          <div class="eyebrow">Claude's read</div>
+          <span class="pill hot" id="aiScore"></span>
+        </div>
+        <p class="status" id="aiStatus"></p>
+        <div id="aiBody"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AFTER POSTING -->
+  <section id="view-post" class="bench" role="tabpanel" aria-labelledby="tab-post" hidden>
+    <div class="panel">
+      <div class="actions" style="justify-content:space-between">
+        <h2>Post stats</h2>
+        <span class="example-tag">Example numbers — replace with yours</span>
+      </div>
+      <p class="note" style="margin:0">Copy these from your Insights or Analytics screen.</p>
+      <div class="row">
+        <label class="f">Views <input id="sViews" type="number" min="0"></label>
+        <label class="f">Likes <input id="sLikes" type="number" min="0"></label>
+        <label class="f">Comments <input id="sComments" type="number" min="0"></label>
+        <label class="f">Shares / sends <input id="sShares" type="number" min="0"></label>
+        <label class="f">Saves <input id="sSaves" type="number" min="0"></label>
+        <label class="f">Follows from post <input id="sFollows" type="number" min="0"></label>
+        <label class="f">Your followers <input id="sFollowers" type="number" min="0"></label>
+        <label class="f">Your usual views <small>median of last 10</small><input id="sAvg" type="number" min="0"></label>
+        <label class="f">Hours since posting <input id="sHours" type="number" min="1"></label>
+        <label class="f">Avg watch % <small>if shown</small><input id="sWatch" type="number" min="0" max="100"></label>
+      </div>
+      <label class="f">What was the post? <small>hook + topic, helps Claude's diagnosis</small>
+        <input id="sTopic" type="text">
+      </label>
+      <div class="actions">
+        <button class="btn" id="diagBtn">Diagnose with Claude</button>
+      </div>
+    </div>
+    <div class="panel">
+      <div>
+        <div class="eyebrow">Readout</div>
+        <p class="verdict" id="sVerdict">—</p>
+        <p class="verdict-sub" id="sVerdictSub"></p>
+      </div>
+      <div class="kpis" id="kpis"></div>
+      <div class="ai-out" id="diagOut" hidden>
+        <hr class="rule">
+        <div class="eyebrow">Claude's diagnosis</div>
+        <p class="status" id="diagStatus"></p>
+        <div class="pre" id="diagBody" hidden></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="histPanel" hidden>
+    <div class="actions" style="justify-content:space-between">
+      <h2>History</h2>
+      <span class="note">Saved in this browser only</span>
+    </div>
+    <div class="history" id="history"></div>
+  </section>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+
+  // Platform profiles: ideal video length (s), hashtag sweet spot, caption guidance
+  const PLATFORMS = {
+    reels:   { label: "Instagram Reels", len: [7, 35],  tags: [3, 5], cap: [60, 400],  fold: 125 },
+    shorts:  { label: "YouTube Shorts", len: [15, 45], tags: [2, 3], cap: [20, 100],  fold: 100 },
+    tiktok:  { label: "TikTok",         len: [9, 40],  tags: [3, 5], cap: [40, 300],  fold: 100 },
+    x:       { label: "X",              len: [0, 45],  tags: [0, 1], cap: [40, 260],  fold: 280 },
+    linkedin:{ label: "LinkedIn",       len: [0, 60],  tags: [2, 3], cap: [400, 1300], fold: 210 }
+  };
+
+  const EXAMPLE = {
+    platform: "reels", niche: "cars", seconds: 28,
+    hook: "Your car's AC smells like old socks? That's not the AC.",
+    onscreen: "AC smell = this ₹300 part",
+    script: "Your car's AC smells like old socks? That's not the AC. It's the cabin filter behind your glovebox. Most people never change it. Here's the 30-second fix. Open the glovebox, squeeze the sides, pull the tray out. If it looks like this, it's done. New one costs about 300 rupees. Slide it in, arrow facing down. Smell gone. Save this before your next service, because the workshop will charge you 1200 for it.",
+    caption: "Your AC isn't broken. Your cabin filter is. 30 seconds, ₹300, zero tools.\n\nSave this for your next service so the workshop can't overcharge you.",
+    tags: "#carcare #carhacks #cabinfilter"
+  };
+
+  const fields = ["niche", "seconds", "hook", "onscreen", "script", "caption", "tags"];
+  let platform = "reels";
+  let isExample = true;
+
+  // ---------- Platform chips ----------
+  const chipBox = $("platforms");
+  Object.entries(PLATFORMS).forEach(([k, p]) => {
+    const b = document.createElement("button");
+    b.className = "chip"; b.type = "button"; b.textContent = p.label; b.dataset.k = k; b.id = "pf-" + k;
+    b.onclick = () => { platform = k; syncChips(); update(); };
+    chipBox.append(b);
+  });
+  function syncChips() { chipBox.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", String(c.dataset.k === platform))); }
+
+  function loadPost(p) {
+    platform = p.platform || "reels";
+    fields.forEach(f => { $(f).value = p[f] ?? ""; });
+    syncChips(); update();
+  }
+  function readPost() {
+    const p = { platform };
+    fields.forEach(f => { p[f] = $(f).value; });
+    p.seconds = Number(p.seconds) || 0;
+    return p;
+  }
+
+  // ---------- Heuristic scoring ----------
+  const POWER = ["secret","mistake","mistakes","stop","never","why","how","nobody","actually","wrong","truth","before","this","don't","dont","worst","best","only","hidden","real","instead","nobody's","everyone","lie","warning","free","fix","cheap","costs","myth"];
+  const OPENERS_BAD = /^(hi|hello|hey guys|hey everyone|in this video|today i|today we|welcome|so,? |namaste)/i;
+  const CTA = /\b(save|share|send|comment|follow|tag|dm|link in bio|subscribe|repost|reply)\b/gi;
+  const words = s => (s.trim().match(/\S+/g) || []);
+
+  function score(p) {
+    const P = PLATFORMS[p.platform];
+    const parts = [], tips = [];
+    const fix = t => tips.push({ t, k: "fix" });
+    const ok = t => tips.push({ t, k: "ok" });
+
+    // Hook (30)
+    let h = 0; const hw = words(p.hook); const hl = p.hook.toLowerCase();
+    if (!hw.length) { fix("Write a hook. The first 2 seconds decide whether anyone sees the rest."); }
+    else {
+      if (hw.length >= 4 && hw.length <= 12) h += 10;
+      else if (hw.length <= 16) { h += 5; fix(`Hook is ${hw.length} words. Cut it to 12 or fewer so it lands before the swipe.`); }
+      else fix(`Hook is ${hw.length} words. Anything over 16 gets swiped. Cut to one sharp line.`);
+      if (/\d|₹|\$|%/.test(p.hook)) h += 4; else fix("Add a number, price or time to the hook. Specifics stop the scroll.");
+      if (/\b(you|your|you're|youre)\b/i.test(p.hook)) h += 5; else fix("Talk to the viewer: put \"you\" or \"your\" in the hook.");
+      const pw = POWER.filter(w => new RegExp("\\b" + w.replace("'", "'?") + "\\b", "i").test(hl)).length;
+      h += Math.min(6, pw * 3); if (!pw) fix("The hook has no tension. Try words like \"mistake\", \"stop\", \"nobody tells you\" or \"why\".");
+      if (/[?!]/.test(p.hook) || /\b(but|not|isn't|wasn't)\b/i.test(p.hook)) h += 5;
+      if (OPENERS_BAD.test(p.hook.trim())) { h -= 10; fix("Don't open with a greeting or \"in this video\". Start with the payoff or the problem."); }
+      if (h >= 24) ok("Strong hook: short, specific and aimed at the viewer.");
+    }
+    h = Math.max(0, Math.min(30, h)); parts.push({ name: "Hook", pts: h, max: 30 });
+
+    // Retention / script (20)
+    let r = 0; const sw = words(p.script); const isVideo = p.seconds > 0;
+    if (isVideo) {
+      const [lo, hi] = P.len;
+      if (p.seconds >= lo && p.seconds <= hi) { r += 8; }
+      else if (p.seconds < lo) { r += 4; fix(`${p.seconds}s is short for ${P.label}. ${lo}–${hi}s gives enough time for a payoff.`); }
+      else { r += Math.max(0, 8 - Math.round((p.seconds - hi) / 10) * 2); fix(`${p.seconds}s is long for ${P.label}. Aim for ${lo}–${hi}s; every extra second costs watch %.`); }
+      if (sw.length) {
+        const wps = sw.length / p.seconds;
+        if (wps >= 2 && wps <= 3.6) r += 4; else if (wps < 2) fix(`Pacing is slow (${wps.toFixed(1)} words/sec). Tighten to 2.5–3.5 so there's no dead air.`); else fix(`Pacing is ${wps.toFixed(1)} words/sec — too fast to follow. Cut words or add seconds.`);
+      }
+    } else { r += 8; if (sw.length) r += 4; }
+    if (/\b(here's|heres|step|first|then|the fix|how to|because|so that|which means)\b/i.test(p.script)) r += 4; else if (sw.length) fix("Make the payoff explicit: \"here's the fix\", \"step one\". Viewers stay for a promised answer.");
+    if (p.hook && p.script && p.script.toLowerCase().includes(p.hook.toLowerCase().slice(0, 20))) r += 2; else if (sw.length && p.hook) fix("Make sure the script opens with the hook word for word.");
+    if (p.onscreen.trim()) r += 2; else if (isVideo) fix("Add on-screen text to the first frame. Most people watch muted.");
+    r = Math.min(20, r); parts.push({ name: "Retention", pts: r, max: 20 });
+
+    // Caption & search (20)
+    let c = 0; const cl = p.caption.trim().length;
+    if (!cl) fix("Write a caption. It's where search keywords and your ask live.");
+    else {
+      const [lo, hi] = P.cap;
+      if (cl >= lo && cl <= hi) c += 6; else fix(cl < lo ? `Caption is thin (${cl} chars). Add a line of context with search words.` : `Caption is ${cl} chars. Trim toward ${hi}.`);
+      const first = p.caption.slice(0, P.fold).toLowerCase();
+      if (p.niche && first.includes(p.niche.toLowerCase().replace(/s$/, ""))) c += 4;
+      else if (p.niche) fix(`Put the word "${p.niche}" (or what people would search) in the first line of the caption.`);
+      if (/\n/.test(p.caption)) c += 2;
+      const firstLine = p.caption.split("\n")[0];
+      if (firstLine.length <= P.fold && firstLine.length > 15) c += 4; else fix(`Keep the first caption line under ${P.fold} characters so it shows before "... more".`);
+      const ctas = (p.caption.match(CTA) || []).length + (p.script.match(CTA) || []).length;
+      if (ctas === 0) fix("Give one clear ask: \"save this\" or \"send this to someone who...\". Shares and saves drive reach.");
+      else if (ctas <= 3) { c += 4; if (/\b(save|send|share)\b/i.test(p.caption + p.script)) ok("Your ask is a save or share, which push reach hardest."); }
+      else fix("Too many asks. Pick one: save, share or comment.");
+    }
+    c = Math.min(20, c); parts.push({ name: "Caption & search", pts: c, max: 20 });
+
+    // Hashtags (10)
+    let t = 0; const tags = (p.tags.match(/#?\w+/g) || []).filter(x => x.length > 1);
+    const [tlo, thi] = P.tags;
+    if (tags.length >= tlo && tags.length <= thi) t = 10;
+    else if (tags.length > thi) { t = Math.max(2, 10 - (tags.length - thi) * 2); fix(`${tags.length} hashtags is too many for ${P.label}. Use ${tlo}–${thi} specific ones.`); }
+    else { t = 4; fix(`Add ${tlo}–${thi} specific hashtags for ${P.label}.`); }
+    if (tags.some(x => /^#?(viral|fyp|foryou|explore|trending|reels|instagood)$/i.test(x))) { t = Math.max(0, t - 4); fix("Drop generic tags like #viral or #fyp. They don't help anyone find you."); }
+    parts.push({ name: "Hashtags", pts: t, max: 10 });
+
+    // Shareability (20)
+    let s = 0; const all = (p.hook + " " + p.script + " " + p.caption).toLowerCase();
+    if (/(₹|\$|rs\.?|rupees|dollars|costs?|price|save money|overcharge|free)/i.test(all)) s += 5;
+    if (/\b(someone|friend|your (dad|mom|wife|husband|partner|brother|sister)|tag)\b/i.test(all)) s += 5;
+    if (/\b(most people|nobody|everyone|myth|wrong|actually|truth|secret|mistake)\b/i.test(all)) s += 5;
+    if (/\b(\d+[- ]?(second|sec|minute|min|step)s?|step|checklist|before you|next time)\b/i.test(all)) s += 5;
+    if (s <= 5) fix("Give people a reason to send it: a money saver, a myth busted, or a \"send this to your dad\" angle.");
+    else if (s >= 15) ok("High share value: it's useful, specific and has someone to send it to.");
+    parts.push({ name: "Share value", pts: s, max: 20 });
+
+    const total = parts.reduce((a, b) => a + b.pts, 0);
+    return { total, parts, tips: tips.filter(x => x.k === "fix").slice(0, 6).concat(tips.filter(x => x.k === "ok").slice(0, 2)) };
+  }
+
+  function band(n) {
+    if (n >= 85) return ["Ready to post", "Strong across the board. Post it at your best time and reply to every comment in the first hour.", "var(--good)"];
+    if (n >= 70) return ["Close — fix the top items", "This has a real shot. The red items below are the difference.", "var(--accent)"];
+    if (n >= 50) return ["Needs work", "The idea may be fine, but the packaging will lose people early.", "var(--warn)"];
+    return ["Not ready", "Rework the hook first. Nothing else matters if people swipe in 2 seconds.", "var(--bad)"];
+  }
+
+  function update() {
+    const p = readPost();
+    $("hookCount").textContent = words(p.hook).length + " words";
+    $("scriptCount").textContent = words(p.script).length + " words" + (p.seconds ? ` · ${(words(p.script).length / p.seconds).toFixed(1)} words/sec` : "");
+    $("captionCount").textContent = p.caption.length + " chars · first line " + p.caption.split("\n")[0].length;
+    const r = score(p);
+    const [v, sub, col] = band(r.total);
+    $("scoreNum").textContent = r.total;
+    $("arc").setAttribute("stroke-dashoffset", (389.6 * (1 - r.total / 100)).toFixed(1));
+    $("arc").setAttribute("stroke", col);
+    $("verdict").textContent = v; $("verdictSub").textContent = sub;
+    $("bars").innerHTML = "";
+    r.parts.forEach(pt => {
+      const pct = pt.pts / pt.max;
+      const c = pct >= 0.8 ? "var(--good)" : pct >= 0.5 ? "var(--accent)" : pct >= 0.3 ? "var(--warn)" : "var(--bad)";
+      const d = document.createElement("div"); d.className = "bar";
+      d.innerHTML = `<span class="name"></span><span class="pts">${pt.pts} / ${pt.max}</span><div class="track"><div class="fill" style="width:${pct * 100}%;background:${c}"></div></div>`;
+      d.querySelector(".name").textContent = pt.name;
+      $("bars").append(d);
+    });
+    $("tips").innerHTML = "";
+    if (!r.tips.length) { const li = document.createElement("li"); li.className = "ok"; li.textContent = "Nothing obvious to fix."; $("tips").append(li); }
+    r.tips.forEach(t => { const li = document.createElement("li"); li.className = t.k; li.textContent = t.t; $("tips").append(li); });
+    lastScore = r;
+  }
+  let lastScore = null;
+
+  fields.forEach(f => $(f).addEventListener("input", () => {
+    if (isExample) { isExample = false; $("exampleTag").hidden = true; }
+    update();
+  }));
+
+  $("clearBtn").onclick = () => { fields.forEach(f => $(f).value = ""); isExample = false; $("exampleTag").hidden = true; $("aiOut").hidden = true; update(); $("hook").focus(); };
+
+  // ---------- History ----------
+  function renderHistory() {
+    const h = store.get("vsl-history", []);
+    $("histPanel").hidden = !h.length;
+    $("history").innerHTML = "";
+    h.forEach(item => {
+      const b = document.createElement("button"); b.className = "hist-item"; b.type = "button";
+      b.innerHTML = `<b></b><span></span><em></em>`;
+      b.querySelector("b").textContent = item.score;
+      b.querySelector("span").textContent = item.post.hook || "(no hook)";
+      b.querySelector("em").textContent = PLATFORMS[item.post.platform].label + " · " + new Date(item.at).toLocaleDateString();
+      b.onclick = () => { isExample = false; $("exampleTag").hidden = true; loadPost(item.post); showTab("pre"); window.scrollTo({ top: 0, behavior: "smooth" }); };
+      $("history").append(b);
+    });
+  }
+  $("saveBtn").onclick = () => {
+    const h = store.get("vsl-history", []);
+    h.unshift({ at: Date.now(), score: lastScore.total, post: readPost() });
+    store.set("vsl-history", h.slice(0, 20));
+    renderHistory();
+    $("saveBtn").textContent = "Saved"; setTimeout(() => $("saveBtn").textContent = "Save to history", 1500);
+  };
+
+  // ---------- Tabs ----------
+  function showTab(t) {
+    $("tab-pre").setAttribute("aria-selected", String(t === "pre"));
+    $("tab-post").setAttribute("aria-selected", String(t === "post"));
+    $("view-pre").hidden = t !== "pre"; $("view-post").hidden = t !== "post";
+    store.set("vsl-tab", t);
+  }
+  $("tab-pre").onclick = () => showTab("pre");
+  $("tab-post").onclick = () => showTab("post");
+
+  // ---------- After-posting stats ----------
+  const SX = { sViews: 48200, sLikes: 2140, sComments: 96, sShares: 1310, sSaves: 1720, sFollows: 380, sFollowers: 6400, sAvg: 4100, sHours: 36, sWatch: 61, sTopic: "Your car's AC smells like old socks? That's not the AC. (cabin filter fix)" };
+  const sIds = Object.keys(SX);
+  sIds.forEach(id => { $(id).value = SX[id]; $(id).addEventListener("input", updateStats); });
+  const pct = (a, b) => b > 0 ? (a / b) * 100 : 0;
+  const fmt = n => n >= 100 ? Math.round(n).toLocaleString() : n.toFixed(n >= 10 ? 1 : 2);
+
+  function statsData() {
+    const g = id => Number($(id).value) || 0;
+    const v = g("sViews");
+    return {
+      views: v, likes: g("sLikes"), comments: g("sComments"), shares: g("sShares"), saves: g("sSaves"),
+      follows: g("sFollows"), followers: g("sFollowers"), avg: g("sAvg"), hours: g("sHours") || 1, watch: g("sWatch"),
+      eng: pct(g("sLikes") + g("sComments") + g("sShares") + g("sSaves"), v),
+      shareRate: pct(g("sShares"), v), saveRate: pct(g("sSaves"), v), commentRate: pct(g("sComments"), v),
+      followRate: pct(g("sFollows"), v), multiple: g("sAvg") ? v / g("sAvg") : 0,
+      reach: g("sFollowers") ? v / g("sFollowers") : 0, perHour: v / (g("sHours") || 1)
+    };
+  }
+
+  function updateStats() {
+    const s = statsData();
+    const k = [
+      { k: "vs. your usual views", v: s.multiple ? fmt(s.multiple) + "×" : "—", pill: s.multiple >= 10 ? ["breakout", "hot"] : s.multiple >= 3 ? ["viral for you", "good"] : s.multiple >= 1.2 ? ["above usual", "good"] : s.multiple ? ["below usual", "bad"] : null },
+      { k: "Share rate", v: fmt(s.shareRate) + "%", pill: s.shareRate >= 2 ? ["excellent", "good"] : s.shareRate >= 0.8 ? ["good", "good"] : s.shareRate >= 0.3 ? ["average", "warn"] : ["low", "bad"] },
+      { k: "Save rate", v: fmt(s.saveRate) + "%", pill: s.saveRate >= 2 ? ["excellent", "good"] : s.saveRate >= 0.8 ? ["good", "good"] : s.saveRate >= 0.3 ? ["average", "warn"] : ["low", "bad"] },
+      { k: "Engagement rate", v: fmt(s.eng) + "%", pill: s.eng >= 8 ? ["excellent", "good"] : s.eng >= 4 ? ["good", "good"] : s.eng >= 2 ? ["average", "warn"] : ["low", "bad"] },
+      { k: "Comment rate", v: fmt(s.commentRate) + "%", pill: s.commentRate >= 0.5 ? ["strong", "good"] : s.commentRate >= 0.15 ? ["average", "warn"] : ["quiet", "bad"] },
+      { k: "Follows per 1k views", v: fmt(s.followRate * 10), pill: s.followRate * 10 >= 5 ? ["strong", "good"] : s.followRate * 10 >= 1.5 ? ["average", "warn"] : ["low", "bad"] },
+      { k: "Reach vs. followers", v: s.reach ? fmt(s.reach) + "×" : "—", pill: s.reach >= 3 ? ["reaching new people", "good"] : s.reach >= 1 ? ["some new reach", "warn"] : s.reach ? ["mostly followers", "bad"] : null },
+      { k: "Views per hour", v: fmt(s.perHour), pill: null },
+      { k: "Avg watch %", v: s.watch ? s.watch + "%" : "—", pill: !s.watch ? null : s.watch >= 70 ? ["excellent", "good"] : s.watch >= 50 ? ["good", "good"] : s.watch >= 35 ? ["average", "warn"] : ["drop-off", "bad"] }
+    ];
+    $("kpis").innerHTML = "";
+    k.forEach(x => {
+      const d = document.createElement("div"); d.className = "kpi";
+      d.innerHTML = `<span class="v"></span><span class="k"></span>`;
+      d.querySelector(".v").textContent = x.v; d.querySelector(".k").textContent = x.k;
+      if (x.pill) { const p = document.createElement("span"); p.className = "pill " + x.pill[1]; p.textContent = x.pill[0]; d.append(p); }
+      $("kpis").append(d);
+    });
+    let v, sub;
+    if (s.multiple >= 10) { v = "Breakout post"; sub = "Over 10× your usual. Make 3 follow-ups on the same topic this week while the algorithm is testing you with new people."; }
+    else if (s.multiple >= 3) { v = "Viral for your account"; sub = "3× your usual or more. Reuse this hook formula and topic angle next."; }
+    else if (s.multiple >= 1.2) { v = "Above your usual"; sub = "Decent. Look at which rate is weakest below — that's what held it back."; }
+    else if (s.multiple > 0) { v = "Underperformed"; sub = "Below your usual. Usually the hook (watch %) or the topic. Compare with your best post."; }
+    else { v = "Enter your stats"; sub = ""; }
+    $("sVerdict").textContent = v; $("sVerdictSub").textContent = sub;
+  }
+
+  // ---------- Claude (sample capability) ----------
+  let sample = null, imagesOk = false;
+  const ERR = {
+    not_granted: "Claude access wasn't allowed for this page. The quick score still works.",
+    sampling_disabled: "Claude isn't available on this account.",
+    rate_limited: "Too many requests right now. Wait a minute and try again.",
+    session_expired: "Sign in to Claude again, then retry.",
+    refused: "Claude declined this one. Try rewording the post.",
+    invalid_json: "The answer came back garbled. Try again.",
+    image_rejected: "That image couldn't be used. Try a JPG or PNG under 20 MB."
+  };
+  const errText = e => ERR[e?.code] || "Something went wrong reaching Claude. Try again.";
+
+  function hideAI() {
+    $("deepBtn").hidden = true; $("diagBtn").hidden = true;
+    $("aiNote").textContent = "The score on the right updates as you type. Open this page in Claude to unlock the deep analysis.";
+  }
+
+  (async () => {
+    try { sample = window.claude ? await window.claude.use("sample") : null; } catch { sample = null; }
+    if (!sample) { hideAI(); return; }
+    try { const lim = await sample.limits(); imagesOk = !!lim?.images; if (imagesOk) $("thumb").accept = lim.images.mediaTypes.join(","); } catch {}
+    $("thumbWrap").hidden = !imagesOk;
+  })();
+  if (!window.claude) hideAI();
+
+  function esc(s) { const d = document.createElement("div"); d.textContent = String(s ?? ""); return d.innerHTML; }
+
+  $("deepBtn").onclick = async () => {
+    if (!sample) return;
+    const p = readPost();
+    if (!p.hook.trim() && !p.script.trim()) { $("aiOut").hidden = false; $("aiStatus").className = "status err"; $("aiStatus").textContent = "Add at least a hook or script first."; $("aiBody").innerHTML = ""; return; }
+    const P = PLATFORMS[p.platform];
+    const prompt = `You are a short-form content strategist who has studied thousands of viral posts. Analyse this ${P.label} post in the "${p.niche || "general"}" niche before it is published.
+
+POST
+Length: ${p.seconds ? p.seconds + " seconds" : "text/image post"}
+Hook (first 2 seconds): ${p.hook}
+On-screen text: ${p.onscreen}
+Script/body:
+${p.script.slice(0, 6000)}
+Caption:
+${p.caption.slice(0, 3000)}
+Hashtags: ${p.tags}
+Quick heuristic score: ${lastScore.total}/100
+${$("thumb").files[0] && imagesOk ? "The attached image is the cover/thumbnail." : ""}
+
+Be blunt and specific to this post. Write the hooks in the same language and voice as the original (keep Hinglish if it's Hinglish). No em dashes.
+
+Reply with only this JSON:
+{"score": <0-100 viral potential>, "verdict": "<one sentence>",
+ "hookFormula": "<name of the hook pattern used, or 'none'>",
+ "strengths": ["<max 3>"], "problems": ["<max 4, most damaging first>"],
+ "hooks": [{"text": "<rewritten hook>", "formula": "<pattern name>"} x5],
+ "retentionRisks": ["<moment where viewers will likely drop off and why, max 3>"],
+ "caption": "<improved caption with one ask>",
+ "hashtags": ["<${P.tags[0]}-${P.tags[1]} specific tags>"],
+ "nextIdeas": ["<3 follow-up post ideas that ride the same angle>"]}`;
+    const opts = { modelTier: "default" };
+    if (imagesOk && $("thumb").files[0]) opts.images = $("thumb").files[0];
+    $("deepBtn").disabled = true; $("aiOut").hidden = false; $("aiBody").innerHTML = ""; $("aiScore").textContent = "";
+    $("aiStatus").className = "status"; $("aiStatus").textContent = "Thinking… this takes 20–60 seconds.";
+    try {
+      const r = await sample.json(prompt, opts);
+      $("aiStatus").textContent = "";
+      $("aiScore").textContent = (Number(r.score) || 0) + " / 100";
+      const list = (title, arr) => Array.isArray(arr) && arr.length ? `<h3>${title}</h3><ul class="tips">${arr.map(x => `<li class="${title === "What works" ? "ok" : "fix"}">${esc(x)}</li>`).join("")}</ul>` : "";
+      let html = `<p class="verdict" style="font-size:18px">${esc(r.verdict)}</p>`;
+      if (r.hookFormula) html += `<p class="note" style="margin:0">Hook pattern: <b>${esc(r.hookFormula)}</b></p>`;
+      html += list("What works", r.strengths) + list("What's hurting it", r.problems) + list("Where people will swipe away", r.retentionRisks);
+      if (Array.isArray(r.hooks) && r.hooks.length) {
+        html += `<h3>Stronger hooks</h3>` + r.hooks.map((h, i) => `<div class="hook-alt"><div><p>${esc(h.text ?? h)}</p><span>${esc(h.formula || "")}</span></div><button class="copy" type="button" data-copy="h${i}">Copy</button></div>`).join("");
+      }
+      if (r.caption) html += `<h3>Better caption</h3><div class="pre">${esc(r.caption)}${r.hashtags?.length ? "\n\n" + esc(r.hashtags.join(" ")) : ""}</div><div><button class="copy" type="button" data-copy="cap">Copy caption</button></div>`;
+      if (Array.isArray(r.nextIdeas) && r.nextIdeas.length) html += `<h3>Post next</h3><ul class="tips">${r.nextIdeas.map(x => `<li>${esc(x)}</li>`).join("")}</ul>`;
+      $("aiBody").innerHTML = html;
+      const copyMap = { cap: (r.caption || "") + (r.hashtags?.length ? "\n\n" + r.hashtags.join(" ") : "") };
+      (r.hooks || []).forEach((h, i) => copyMap["h" + i] = h.text ?? String(h));
+      $("aiBody").querySelectorAll("[data-copy]").forEach(b => b.onclick = async () => {
+        try { await navigator.clipboard.writeText(copyMap[b.dataset.copy]); b.textContent = "Copied"; }
+        catch { b.textContent = "Select and copy manually"; }
+        setTimeout(() => b.textContent = b.dataset.copy === "cap" ? "Copy caption" : "Copy", 1500);
+      });
+    } catch (e) {
+      if (e?.code === "not_granted" || e?.code === "sampling_disabled") hideAI();
+      $("aiStatus").className = "status err"; $("aiStatus").textContent = errText(e);
+    } finally { $("deepBtn").disabled = false; }
+  };
+
+  $("diagBtn").onclick = async () => {
+    if (!sample) return;
+    const s = statsData();
+    const prompt = `You are a short-form content analyst. Diagnose this post's performance and tell the creator exactly what to do next. Be blunt, specific, practical. Plain text, short sections with these headings: VERDICT, WHAT DROVE IT, WHAT HELD IT BACK, DO THIS NEXT (3 concrete actions). No em dashes, no markdown symbols.
+
+Post: ${$("sTopic").value || "(not given)"}
+Views ${s.views}, likes ${s.likes}, comments ${s.comments}, shares ${s.shares}, saves ${s.saves}, follows ${s.follows}
+Followers ${s.followers}, usual views ${s.avg}, hours live ${s.hours}, avg watch ${s.watch || "unknown"}%
+Computed: ${s.multiple.toFixed(2)}x usual views, share rate ${s.shareRate.toFixed(2)}%, save rate ${s.saveRate.toFixed(2)}%, engagement ${s.eng.toFixed(2)}%, comment rate ${s.commentRate.toFixed(2)}%, follows per 1k views ${(s.followRate * 10).toFixed(2)}, reach ${s.reach.toFixed(2)}x followers.`;
+    $("diagBtn").disabled = true; $("diagOut").hidden = false; $("diagBody").hidden = true;
+    $("diagStatus").className = "status"; $("diagStatus").textContent = "Thinking…";
+    try {
+      await sample(prompt, { onText: ({ text }) => { $("diagStatus").textContent = ""; $("diagBody").hidden = false; $("diagBody").textContent = text; } });
+    } catch (e) {
+      if (e?.text) { $("diagBody").hidden = false; $("diagBody").textContent = e.text; }
+      if (e?.code === "not_granted" || e?.code === "sampling_disabled") hideAI();
+      if (e?.code !== "cancelled") { $("diagStatus").className = "status err"; $("diagStatus").textContent = errText(e); }
+    } finally { $("diagBtn").disabled = false; }
+  };
+
+  // ---------- Boot ----------
+  loadPost(EXAMPLE);
+  updateStats();
+  renderHistory();
+  showTab(store.get("vsl-tab", "pre") === "post" ? "post" : "pre");
+})();
+</script>
+
+</body>
+</html>
