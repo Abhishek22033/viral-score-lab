@@ -1,0 +1,524 @@
+<!--
+  TechMachaw: Free Amazon Keyword Tools (paste-in block)
+  Suggested URL: /tools/amazon-keyword-tools/  (Page title "Free Amazon Keyword Tools", parent page "Tools")
+
+  BEFORE YOU PASTE
+  The Keyword Finder needs the "Amazon keyword relay" snippet installed once
+  (file amazon-keyword-relay.php, uses the free Code Snippets plugin).
+  Everything else on this page works without it.
+
+  HOW TO PASTE
+  1. Pages > Add New. Add a "Custom HTML" block and paste this whole file into it.
+  2. Preview, run each tool once, then publish.
+
+  AFFILIATE LINK
+  Uses your existing Helium 10 link: https://i.helium10.com/c/2788819/3314049/37271
+  The script contains no bare ampersand characters, because WordPress escapes them.
+-->
+<style>
+.entry-header{display:none}
+#tmc-amz-kw{--a:#4F46E5;--ad:#3f37c9;--ink:#111827;--mut:#6b7280;--line:#e5e7eb;--soft:#f8f9fc;--good:#059669;--warn:#d97706;--bad:#dc2626;
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);font-size:16px;line-height:1.55;max-width:1080px;margin:0 auto}
+#tmc-amz-kw *{box-sizing:border-box}
+#tmc-amz-kw h1,#tmc-amz-kw h2,#tmc-amz-kw h3{font-family:Manrope,Inter,system-ui,sans-serif;font-weight:800;letter-spacing:-.02em;color:var(--ink);margin:0}
+#tmc-amz-kw h1{font-size:clamp(28px,5vw,40px);line-height:1.1}
+#tmc-amz-kw h2{font-size:22px}
+#tmc-amz-kw h3{font-size:16px}
+#tmc-amz-kw p{margin:0}
+#tmc-amz-kw .tmc-hero{display:flex;flex-direction:column;gap:10px;padding:8px 0 20px}
+#tmc-amz-kw .tmc-lead{color:var(--mut);max-width:64ch}
+#tmc-amz-kw .tmc-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}
+#tmc-amz-kw .tmc-tab{font:600 14px Inter,system-ui,sans-serif!important;padding:10px 14px!important;border-radius:10px!important;border:1px solid var(--line)!important;background:#fff!important;background-image:none!important;color:var(--ink)!important;box-shadow:none!important;cursor:pointer;text-transform:none!important;letter-spacing:0!important}
+#tmc-amz-kw .tmc-tab[aria-selected="true"]{background:var(--a)!important;border-color:var(--a)!important;color:#fff!important}
+#tmc-amz-kw .tmc-card{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 1px 2px rgba(16,24,40,.04);padding:20px;display:flex;flex-direction:column;gap:16px}
+#tmc-amz-kw .tmc-two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}
+#tmc-amz-kw .tmc-col{display:flex;flex-direction:column;gap:14px;min-width:0}
+#tmc-amz-kw .tmc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+#tmc-amz-kw .tmc-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+#tmc-amz-kw .tmc-row > label{flex:1 1 200px}
+#tmc-amz-kw label{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px;min-width:0}
+#tmc-amz-kw label small{font-weight:400;color:var(--mut)}
+#tmc-amz-kw input,#tmc-amz-kw textarea,#tmc-amz-kw select{font:400 15px Inter,system-ui,sans-serif;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%;min-width:0;margin:0}
+#tmc-amz-kw textarea{resize:vertical}
+#tmc-amz-kw input[type="number"]{font-variant-numeric:tabular-nums}
+#tmc-amz-kw input:focus,#tmc-amz-kw textarea:focus,#tmc-amz-kw select:focus{outline:2px solid var(--a);outline-offset:1px}
+#tmc-amz-kw .tmc-check{flex-direction:row;align-items:center;gap:8px;font-weight:500}
+#tmc-amz-kw .tmc-check input{width:auto}
+#tmc-amz-kw .tmc-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font:600 15px Inter,system-ui,sans-serif!important;padding:11px 18px!important;border-radius:10px!important;border:1px solid var(--a)!important;background:var(--a)!important;background-image:none!important;color:#fff!important;box-shadow:none!important;cursor:pointer;text-decoration:none!important;text-transform:none!important;letter-spacing:0!important;line-height:1.2!important;white-space:nowrap}
+#tmc-amz-kw .tmc-btn:hover{background:var(--ad)!important;border-color:var(--ad)!important;color:#fff!important}
+#tmc-amz-kw .tmc-btn.tmc-ghost{background:#fff!important;color:var(--ink)!important;border:1px solid var(--line)!important}
+#tmc-amz-kw .tmc-btn.tmc-ghost:hover{background:var(--soft)!important;color:var(--ink)!important;border-color:#d1d5db!important}
+#tmc-amz-kw .tmc-btn.tmc-sm{padding:6px 10px!important;font-size:13px!important}
+#tmc-amz-kw .tmc-btn[disabled]{opacity:.6;cursor:progress}
+#tmc-amz-kw .tmc-note{font-size:13px;color:var(--mut)}
+#tmc-amz-kw .tmc-err{font-size:14px;color:var(--bad)}
+#tmc-amz-kw .tmc-count{font-size:12px;color:var(--mut);font-weight:400;font-variant-numeric:tabular-nums}
+#tmc-amz-kw .tmc-count.over{color:var(--bad);font-weight:600}
+#tmc-amz-kw .tmc-table-wrap{overflow:auto;max-height:560px;border:1px solid var(--line);border-radius:12px}
+#tmc-amz-kw table{border-collapse:collapse;width:100%;font-size:14px;margin:0}
+#tmc-amz-kw th,#tmc-amz-kw td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+#tmc-amz-kw th{position:sticky;top:0;z-index:1;background:var(--soft);font-weight:600;font-size:13px;color:var(--mut);cursor:pointer;user-select:none}
+#tmc-amz-kw td.kw{white-space:normal;min-width:200px;font-weight:500}
+#tmc-amz-kw td.num{font-variant-numeric:tabular-nums}
+#tmc-amz-kw .tmc-meter{display:inline-block;width:56px;height:6px;border-radius:9px;background:var(--line);vertical-align:middle;margin-right:8px;overflow:hidden}
+#tmc-amz-kw .tmc-meter i{display:block;height:100%;border-radius:9px}
+#tmc-amz-kw .tmc-out{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:12px;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere;min-height:46px;margin:0;font-family:inherit}
+#tmc-amz-kw .tmc-chips{display:flex;flex-wrap:wrap;gap:6px}
+#tmc-amz-kw .tmc-chip{font:500 13px Inter,sans-serif;padding:4px 10px;border-radius:99px;border:1px solid var(--line);background:#fff;color:var(--ink)}
+#tmc-amz-kw .tmc-chip.t{background:#ecfdf5;border-color:#a7f3d0;color:#047857}
+#tmc-amz-kw .tmc-chip.b{background:#eef2ff;border-color:#c7d2fe;color:#3730a3}
+#tmc-amz-kw .tmc-chip.p{background:#fffbeb;border-color:#fde68a;color:#92400e}
+#tmc-amz-kw .tmc-chip.m{background:#fef2f2;border-color:#fecaca;color:#b91c1c}
+#tmc-amz-kw .tmc-legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--mut)}
+#tmc-amz-kw .tmc-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+#tmc-amz-kw .tmc-list li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;font-size:14px;margin:0}
+#tmc-amz-kw .tmc-ok{color:var(--good)} #tmc-amz-kw .tmc-mid{color:var(--warn)} #tmc-amz-kw .tmc-no{color:var(--bad)}
+#tmc-amz-kw .tmc-score{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+#tmc-amz-kw .tmc-big{font:800 44px/1 Manrope,Inter,sans-serif;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+#tmc-amz-kw .tmc-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+#tmc-amz-kw .tmc-kpi{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--soft);display:flex;flex-direction:column;gap:2px}
+#tmc-amz-kw .tmc-kpi b{font:800 22px Manrope,Inter,sans-serif;font-variant-numeric:tabular-nums}
+#tmc-amz-kw .tmc-kpi span{font-size:13px;color:var(--mut)}
+#tmc-amz-kw .tmc-cta{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:#eef2ff;border:1px solid #c7d2fe;color:#312e81;border-radius:12px;padding:14px 16px}
+#tmc-amz-kw .tmc-cta p{color:#312e81;font-size:14px;max-width:60ch}
+#tmc-amz-kw .tmc-cta b{color:#312e81}
+#tmc-amz-kw .tmc-foot{font-size:13px;color:var(--mut);margin-top:20px;display:flex;flex-direction:column;gap:6px}
+#tmc-amz-kw .tmc-foot a{color:var(--a)}
+#tmc-amz-kw [hidden]{display:none!important}
+@media (max-width:600px){
+  #tmc-amz-kw .tmc-two{grid-template-columns:minmax(0,1fr)}
+  #tmc-amz-kw .tmc-card{padding:16px}
+  #tmc-amz-kw .tmc-tab{flex:1 1 45%}
+}
+</style>
+
+<div id="tmc-amz-kw">
+  <div class="tmc-hero">
+    <h1>Free Amazon Keyword Tools</h1>
+    <p class="tmc-lead">Find what shoppers type into Amazon search, clean and pack your keywords into the 250 byte backend field, check which keywords your listing covers, and work out your break-even ACoS and how many reviews you need. Free, no login. Pairs with our <a href="/tools/amazon-seller-tools/">FBA profit calculator and listing checker</a>.</p>
+  </div>
+
+  <div class="tmc-tabs" role="tablist">
+    <button type="button" class="tmc-tab" role="tab" id="tmc-t-find" aria-selected="true" data-p="find">Keyword Finder</button>
+    <button type="button" class="tmc-tab" role="tab" id="tmc-t-proc" aria-selected="false" data-p="proc">Keyword Processor</button>
+    <button type="button" class="tmc-tab" role="tab" id="tmc-t-build" aria-selected="false" data-p="build">Listing Builder</button>
+    <button type="button" class="tmc-tab" role="tab" id="tmc-t-ppc" aria-selected="false" data-p="ppc">PPC Calculator</button>
+    <button type="button" class="tmc-tab" role="tab" id="tmc-t-rev" aria-selected="false" data-p="rev">Review Calculator</button>
+  </div>
+
+  <!-- KEYWORD FINDER -->
+  <section class="tmc-card" id="tmc-p-find" role="tabpanel">
+    <div>
+      <h2>Keyword Finder</h2>
+      <p class="tmc-note">Type a product. We collect the phrases Amazon suggests as shoppers type, across the alphabet, and rank them.</p>
+    </div>
+    <div class="tmc-row">
+      <label for="tmc-f-seed">Product or seed keyword<input id="tmc-f-seed" type="text" placeholder="e.g. yoga mat, steel water bottle, kurta for women"></label>
+      <label for="tmc-f-mkt" style="flex:0 1 200px">Marketplace<select id="tmc-f-mkt">
+        <option value="us">Amazon.com (US)</option><option value="in">Amazon.in (India)</option><option value="uk">Amazon.co.uk</option><option value="ca">Amazon.ca</option><option value="ae">Amazon.ae</option><option value="au">Amazon.com.au</option><option value="de">Amazon.de</option>
+      </select></label>
+      <button type="button" class="tmc-btn" id="tmc-f-go">Find keywords</button>
+    </div>
+    <p class="tmc-note" id="tmc-f-status"></p>
+    <div id="tmc-f-out" hidden>
+      <div class="tmc-row" style="justify-content:space-between;align-items:center;margin-bottom:10px">
+        <p class="tmc-note" id="tmc-f-sum"></p>
+        <div class="tmc-row">
+          <button type="button" class="tmc-btn tmc-sm" id="tmc-f-send">Send top 40 to Listing Builder</button>
+          <button type="button" class="tmc-btn tmc-ghost tmc-sm" id="tmc-f-copy">Copy all</button>
+          <button type="button" class="tmc-btn tmc-ghost tmc-sm" id="tmc-f-csv">Download CSV</button>
+        </div>
+      </div>
+      <div class="tmc-table-wrap">
+        <table>
+          <thead><tr><th data-k="kw">Keyword</th><th data-k="demand">Demand</th><th data-k="words">Words</th><th data-k="type">Type</th></tr></thead>
+          <tbody id="tmc-f-body"></tbody>
+        </table>
+      </div>
+      <p class="tmc-note" style="margin-top:10px">Demand is an estimate from where and how often a phrase appears in Amazon's suggestions, which Amazon orders by popularity. It is not monthly search volume. Long-tail phrases (4 or more words) usually convert better and cost less in PPC.</p>
+    </div>
+    <div class="tmc-cta">
+      <p><b>Need real monthly search volume?</b> Helium 10 Magnet and Cerebro show search volume per keyword and every keyword a competitor ASIN ranks for. Our link takes 20% off your first 6 months.</p>
+      <a class="tmc-btn" href="https://i.helium10.com/c/2788819/3314049/37271" target="_blank" rel="sponsored nofollow noopener">Get 20% off Helium 10</a>
+    </div>
+  </section>
+
+  <!-- KEYWORD PROCESSOR -->
+  <section class="tmc-card" id="tmc-p-proc" role="tabpanel" hidden>
+    <div>
+      <h2>Keyword Processor</h2>
+      <p class="tmc-note">Paste messy keyword lists from anywhere. It removes duplicates, brand names and filler words, and packs the rest into a backend search terms line under Amazon's 250 byte limit.</p>
+    </div>
+    <div class="tmc-two">
+      <div class="tmc-col">
+        <label for="tmc-p-in">Keywords <small>one per line or comma separated</small><textarea id="tmc-p-in" rows="9">yoga mat
+yoga mat thick
+Yoga Mat Thick
+non slip yoga mat
+yoga mat for women
+manduka yoga mat
+exercise mat for home workout
+thick exercise mat, pilates mat
+yoga mat with strap
+eco friendly yoga mat</textarea></label>
+        <label for="tmc-p-brands">Words to remove <small>brands and competitor names, comma separated</small><input id="tmc-p-brands" type="text" value="manduka, gaiam, liforme"></label>
+        <label for="tmc-p-title">Your title <small>optional: words already in it are left out of the backend line</small><input id="tmc-p-title" type="text" value="Thick Yoga Mat for Women and Men, Non Slip Exercise Mat with Strap"></label>
+        <label class="tmc-check" for="tmc-p-stop"><input id="tmc-p-stop" type="checkbox" checked> Remove filler words (for, with, and, the...)</label>
+        <p class="tmc-note">Words like best, cheap, sale and prices are left out of the backend line automatically, because Amazon does not allow claims there. Check the word list for other brands' names and add them above: using a competitor's brand in your search terms breaks Amazon's rules.</p>
+      </div>
+      <div class="tmc-col">
+        <div><h3>Backend search terms <span class="tmc-count" id="tmc-p-bytes"></span></h3></div>
+        <p class="tmc-out" id="tmc-p-backend"></p>
+        <div class="tmc-row"><button type="button" class="tmc-btn tmc-sm" id="tmc-p-copyb">Copy backend line</button></div>
+        <p class="tmc-note" id="tmc-p-left"></p>
+        <div><h3>Clean phrases <span class="tmc-count" id="tmc-p-pc"></span></h3></div>
+        <p class="tmc-out" id="tmc-p-phrases"></p>
+        <div class="tmc-row"><button type="button" class="tmc-btn tmc-ghost tmc-sm" id="tmc-p-copyp">Copy phrases</button><button type="button" class="tmc-btn tmc-ghost tmc-sm" id="tmc-p-sendp">Use in Listing Builder</button></div>
+        <div><h3>Word frequency</h3><p class="tmc-note">Words that appear in many phrases belong in your title.</p></div>
+        <div class="tmc-chips" id="tmc-p-freq"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LISTING BUILDER -->
+  <section class="tmc-card" id="tmc-p-build" role="tabpanel" hidden>
+    <div>
+      <h2>Listing Builder</h2>
+      <p class="tmc-note">Write your listing against a keyword list. Each keyword lights up as you use it, so you can see what is still missing.</p>
+    </div>
+    <div class="tmc-two">
+      <div class="tmc-col">
+        <label for="tmc-b-kws">Target keywords <small>one per line, most important first</small><textarea id="tmc-b-kws" rows="6">yoga mat
+thick yoga mat
+non slip yoga mat
+yoga mat for women
+exercise mat
+pilates mat
+yoga mat with strap
+eco friendly yoga mat</textarea></label>
+        <label for="tmc-b-brand">Brand name <small>allowed to repeat, ignored in checks</small><input id="tmc-b-brand" type="text" value="Asana Co"></label>
+        <label for="tmc-b-title">Title <span class="tmc-count" id="tmc-b-tc"></span><textarea id="tmc-b-title" rows="2">Asana Co Thick Yoga Mat for Women and Men, 10mm Non Slip Exercise Mat with Carry Strap for Home Workout</textarea></label>
+        <label for="tmc-b-bul">Bullet points <small>one per line, up to 5</small> <span class="tmc-count" id="tmc-b-bc"></span><textarea id="tmc-b-bul" rows="6">EXTRA THICK 10MM CUSHION: protects knees and wrists on hard floors, ideal for yoga, pilates and stretching
+NON SLIP GRIP: textured surface on both sides keeps the mat in place, even in hot yoga
+EASY TO CARRY: comes with a strap, rolls up light for the gym or travel
+SAFE MATERIALS: free from PVC and latex, no strong smell
+SIZE: 183 x 61 cm, room for taller users</textarea></label>
+        <label for="tmc-b-desc">Description <small>optional</small><textarea id="tmc-b-desc" rows="3">A thick, cushioned exercise mat for home workouts, yoga and pilates.</textarea></label>
+        <label for="tmc-b-back">Backend search terms <span class="tmc-count" id="tmc-b-kc"></span><textarea id="tmc-b-back" rows="2">workout mat gym floor fitness large</textarea></label>
+      </div>
+      <div class="tmc-col">
+        <div class="tmc-score"><span class="tmc-big" id="tmc-b-score">0%</span><p class="tmc-note">keyword coverage,<br>weighted by your order</p></div>
+        <div class="tmc-legend"><span><span class="tmc-chip t">in title</span></span><span><span class="tmc-chip b">bullets or description</span></span><span><span class="tmc-chip p">backend only</span></span><span><span class="tmc-chip m">missing</span></span></div>
+        <div class="tmc-chips" id="tmc-b-chips"></div>
+        <div><h3>Listing checks</h3></div>
+        <ul class="tmc-list" id="tmc-b-checks"></ul>
+      </div>
+    </div>
+    <div class="tmc-cta">
+      <p><b>Want the keywords your top competitors rank for?</b> Helium 10 Cerebro pulls them from any ASIN, and Listing Builder scores them by search volume as you write. Our link takes 20% off your first 6 months.</p>
+      <a class="tmc-btn" href="https://i.helium10.com/c/2788819/3314049/37271" target="_blank" rel="sponsored nofollow noopener">Get 20% off Helium 10</a>
+    </div>
+  </section>
+
+  <!-- PPC CALCULATOR -->
+  <section class="tmc-card" id="tmc-p-ppc" role="tabpanel" hidden>
+    <div>
+      <h2>PPC Calculator</h2>
+      <p class="tmc-note">Work out the most you can spend on Amazon ads before a sale loses money, and the bid that keeps you profitable. Get your profit per unit from the <a href="/tools/amazon-seller-tools/">FBA profit calculator</a>.</p>
+    </div>
+    <div class="tmc-grid">
+      <label for="tmc-c-price">Selling price<input id="tmc-c-price" type="number" min="0" step="0.01" value="29.99"></label>
+      <label for="tmc-c-profit">Profit per unit before ads <small>after cost and all Amazon fees</small><input id="tmc-c-profit" type="number" step="0.01" value="9.50"></label>
+      <label for="tmc-c-cr">Conversion rate % <small>orders / clicks</small><input id="tmc-c-cr" type="number" min="0" step="0.1" value="10"></label>
+      <label for="tmc-c-target">Profit you want to keep per unit, after ads<input id="tmc-c-target" type="number" step="0.01" value="4"></label>
+      <label for="tmc-c-spend">Ad spend last 30 days <small>optional, for TACoS</small><input id="tmc-c-spend" type="number" min="0" step="0.01" value="900"></label>
+      <label for="tmc-c-adsales">Ad sales last 30 days<input id="tmc-c-adsales" type="number" min="0" step="0.01" value="3600"></label>
+      <label for="tmc-c-total">Total sales last 30 days <small>ads plus organic</small><input id="tmc-c-total" type="number" min="0" step="0.01" value="9000"></label>
+    </div>
+    <div><h3 id="tmc-c-verdict"></h3><p class="tmc-note" id="tmc-c-sub"></p></div>
+    <div class="tmc-kpis" id="tmc-c-kpis"></div>
+    <div class="tmc-cta">
+      <p><b>Running more than a few campaigns?</b> Helium 10 Adtomic adjusts bids toward your target ACoS automatically and finds negative keywords that waste spend. Our link takes 20% off your first 6 months.</p>
+      <a class="tmc-btn" href="https://i.helium10.com/c/2788819/3314049/37271" target="_blank" rel="sponsored nofollow noopener">Get 20% off Helium 10</a>
+    </div>
+  </section>
+
+  <!-- REVIEW CALCULATOR -->
+  <section class="tmc-card" id="tmc-p-rev" role="tabpanel" hidden>
+    <div>
+      <h2>Review Calculator</h2>
+      <p class="tmc-note">How many 5-star ratings you need to reach a target, and how much one bad rating costs you.</p>
+    </div>
+    <div class="tmc-grid">
+      <label for="tmc-r-avg">Current average rating<input id="tmc-r-avg" type="number" min="1" max="5" step="0.01" value="4.1"></label>
+      <label for="tmc-r-n">Number of ratings<input id="tmc-r-n" type="number" min="0" step="1" value="86"></label>
+      <label for="tmc-r-target">Target rating<input id="tmc-r-target" type="number" min="1" max="5" step="0.1" value="4.5"></label>
+    </div>
+    <div class="tmc-kpis" id="tmc-r-kpis"></div>
+    <p class="tmc-note">Amazon's shown rating is not a plain average: it gives more weight to recent and verified purchase ratings. Treat these as close estimates. Never pay for or incentivise reviews; use Amazon's Request a Review button and Vine instead.</p>
+  </section>
+
+  <div class="tmc-foot">
+    <p>Some of the links on this page may be affiliate links, which means we may earn a commission if you upgrade later, at no extra cost to you. The Helium 10 links carry 20% off your first 6 months.</p>
+    <p>Keyword suggestions come from Amazon's public search suggestions. Everything else runs in your browser and nothing you type is stored. TechMachaw is not affiliated with Amazon or Helium 10.</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  var A = String.fromCharCode(38);
+  var RELAY = '/wp-json/tmc/v1/amazon-suggest';
+  var root = document.getElementById('tmc-amz-kw');
+  function $(id){ return document.getElementById(id); }
+  function esc(s){ return String(s).split(A).join(A+'amp;').replace(/</g,A+'lt;').replace(/>/g,A+'gt;').replace(/"/g,A+'quot;').replace(/'/g,A+'#39;'); }
+  function bytes(s){ return new TextEncoder().encode(s).length; }
+  function num(id){ var v = parseFloat($(id).value); return isFinite(v) ? v : 0; }
+  function money(v){ return (v < 0 ? '-' : '') + Math.abs(v).toFixed(2); }
+  function color(v){ return v >= 70 ? '#059669' : (v >= 45 ? '#d97706' : '#dc2626'); }
+  function copyText(t, btn){
+    function done(){ var o = btn.textContent; btn.textContent = 'Copied'; setTimeout(function(){ btn.textContent = o; }, 1400); }
+    function fb(){ var ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch(e) {} document.body.removeChild(ta); done(); }
+    if(navigator.clipboard){ navigator.clipboard.writeText(t).then(done, fb); } else { fb(); }
+  }
+  function download(name, text){
+    var b = new Blob([text], {type: 'text/csv'}), u = URL.createObjectURL(b), a = document.createElement('a');
+    a.href = u; a.download = name; document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(u); a.remove(); }, 500);
+  }
+  function lines(s){ return s.split(/[\n,]+/).map(function(x){ return x.trim().replace(/\s+/g, ' '); }).filter(function(x){ return x.length > 0; }); }
+
+  /* tabs */
+  var tabs = root.querySelectorAll('.tmc-tab');
+  function show(p){
+    for(var j = 0; j < tabs.length; j++){
+      var on = tabs[j].getAttribute('data-p') === p;
+      tabs[j].setAttribute('aria-selected', on ? 'true' : 'false');
+      $('tmc-p-' + tabs[j].getAttribute('data-p')).hidden = !on;
+    }
+  }
+  for(var i = 0; i < tabs.length; i++){ tabs[i].addEventListener('click', function(){ show(this.getAttribute('data-p')); }); }
+
+  /* ---------- Keyword Finder ---------- */
+  var rows = [], sortKey = 'demand';
+  function getSug(q, mkt){
+    return fetch(RELAY + '?mkt=' + mkt + A + 'q=' + encodeURIComponent(q)).then(function(r){
+      if(r.status === 429){ throw new Error('limit'); }
+      if(!r.ok){ throw new Error('http'); }
+      return r.json();
+    }).then(function(d){ return (d.suggestions || []).map(function(x){ return String(x); }); });
+  }
+  function renderRows(){
+    var list = rows.slice().sort(function(a, b){
+      if(sortKey === 'kw' || sortKey === 'type'){ return String(a[sortKey]).localeCompare(String(b[sortKey])); }
+      return b[sortKey] - a[sortKey];
+    }).slice(0, 200);
+    $('tmc-f-body').innerHTML = list.map(function(r){
+      return '<tr><td class="kw">' + esc(r.kw) + '</td><td class="num"><span class="tmc-meter"><i style="width:' + r.demand + '%;background:' + color(r.demand) + '"></i></span>' + r.demand + '</td><td class="num">' + r.words + '</td><td>' + r.type + '</td></tr>';
+    }).join('');
+  }
+  var heads = root.querySelectorAll('#tmc-p-find th[data-k]');
+  for(var h = 0; h < heads.length; h++){ heads[h].addEventListener('click', function(){ sortKey = this.getAttribute('data-k'); renderRows(); }); }
+
+  $('tmc-f-go').addEventListener('click', function(){
+    var seed = $('tmc-f-seed').value.trim().toLowerCase().replace(/\s+/g, ' ');
+    if(!seed){ $('tmc-f-status').textContent = 'Type a product first.'; return; }
+    var mkt = $('tmc-f-mkt').value, btn = this;
+    var qs = [{q: seed, w: 1}], L = 'abcdefghijklmnopqrstuvwxyz';
+    for(var i = 0; i < L.length; i++){ qs.push({q: seed + ' ' + L.charAt(i), w: 0.7}); }
+    ['best ', 'cheap ', 'large ', 'small '].forEach(function(p){ qs.push({q: p + seed, w: 0.75}); });
+    [' for', ' with', ' set'].forEach(function(p){ qs.push({q: seed + p, w: 0.75}); });
+    var map = {}, done = 0, fails = 0, limited = false, idx = 0, active = 0;
+    btn.disabled = true;
+    function finishAll(){
+      btn.disabled = false;
+      rows = [];
+      for(var k in map){ if(map.hasOwnProperty(k)){
+        var m = map[k], words = k.split(' ').length;
+        rows.push({kw: k, demand: Math.max(5, Math.min(100, m.best + (m.hits - 1) * 8)), words: words, type: words >= 4 ? 'Long-tail' : (words === 3 ? 'Mid-tail' : 'Short-tail')});
+      } }
+      if(!rows.length){
+        $('tmc-f-out').hidden = true;
+        $('tmc-f-status').innerHTML = '<span class="tmc-err">' + (limited ? 'You have hit the hourly lookup limit. Try again later.' : (fails === qs.length ? 'Could not reach Amazon suggestions. Try again in a minute, or try another marketplace.' : 'No suggestions found. Try a shorter, more common product name.')) + '</span>';
+        return;
+      }
+      sortKey = 'demand'; renderRows();
+      $('tmc-f-out').hidden = false; $('tmc-f-status').textContent = '';
+      $('tmc-f-sum').textContent = rows.length + ' keywords for "' + seed + '" on ' + $('tmc-f-mkt').options[$('tmc-f-mkt').selectedIndex].text + (rows.length > 200 ? ', top 200 shown' : '') + '. Click a column to sort.';
+    }
+    function next(){
+      while(active < 4){
+        if(idx >= qs.length){ break; }
+        (function(q){
+          active++;
+          getSug(q.q, mkt).then(function(list){
+            list.forEach(function(s, r){
+              var k = s.toLowerCase().trim(); if(!k){ return; }
+              var pts = Math.round(q.w * (100 - r * 7));
+              if(!map[k]){ map[k] = {best: 0, hits: 0}; }
+              map[k].hits++; if(pts > map[k].best){ map[k].best = pts; }
+            });
+          }, function(e){ fails++; if(e.message === 'limit'){ limited = true; } }).then(function(){
+            active--; done++;
+            $('tmc-f-status').textContent = 'Checking Amazon suggestions... ' + done + ' of ' + qs.length;
+            if(done === qs.length){ finishAll(); } else { next(); }
+          });
+        })(qs[idx++]);
+      }
+    }
+    $('tmc-f-status').textContent = 'Checking Amazon suggestions... 0 of ' + qs.length;
+    next();
+  });
+  $('tmc-f-seed').addEventListener('keydown', function(e){ if(e.key === 'Enter'){ $('tmc-f-go').click(); } });
+  function topKw(n){ return rows.slice().sort(function(a, b){ return b.demand - a.demand; }).slice(0, n).map(function(r){ return r.kw; }); }
+  $('tmc-f-copy').addEventListener('click', function(){ copyText(topKw(9999).join('\n'), this); });
+  $('tmc-f-csv').addEventListener('click', function(){
+    var out = ['keyword,demand,words,type'];
+    rows.slice().sort(function(a, b){ return b.demand - a.demand; }).forEach(function(r){ out.push('"' + r.kw.replace(/"/g, '""') + '",' + r.demand + ',' + r.words + ',' + r.type); });
+    download('amazon-keywords-' + ($('tmc-f-seed').value.trim().replace(/[^a-z0-9]+/gi, '-').toLowerCase() || 'export') + '.csv', out.join('\n'));
+  });
+  $('tmc-f-send').addEventListener('click', function(){
+    $('tmc-b-kws').value = topKw(40).join('\n'); $('tmc-p-in').value = topKw(9999).join('\n');
+    processKw(); buildCheck(); show('build'); $('tmc-p-build').scrollIntoView({behavior: 'smooth', block: 'start'});
+  });
+
+  /* ---------- Keyword Processor ---------- */
+  var STOP = {'a':1,'an':1,'and':1,'or':1,'the':1,'for':1,'with':1,'of':1,'to':1,'in':1,'on':1,'by':1,'at':1,'is':1,'it':1,'this':1,'that':1,'from':1,'as':1,'be':1,'are':1};
+  /* Amazon does not want subjective, price or time claims in search terms */
+  var NOBACK = {'best':1,'cheap':1,'cheapest':1,'top':1,'sale':1,'free':1,'new':1,'amazing':1,'great':1,'good':1,'deal':1,'deals':1,'discount':1,'under':1,'dollar':1,'dollars':1,'rupees':1,'rs':1,'offer':1,'latest':1,'2026':1,'2027':1,'amazon':1};
+  var lastBackend = '', lastPhrases = [];
+  function processKw(){
+    var brands = {}; lines($('tmc-p-brands').value.toLowerCase()).forEach(function(b){ b.split(' ').forEach(function(w){ brands[w] = 1; }); });
+    var titleWords = {}; ($('tmc-p-title').value.toLowerCase().match(/[\p{L}\p{N}]+/gu) || []).forEach(function(w){ titleWords[w] = 1; });
+    var stop = $('tmc-p-stop').checked;
+    var seen = {}, phrases = [], freq = {};
+    lines($('tmc-p-in').value.toLowerCase()).forEach(function(p){
+      var words = (p.match(/[\p{L}\p{N}][\p{L}\p{N}'-]*/gu) || []).filter(function(w){ return !brands[w]; });
+      var clean = words.join(' ');
+      if(!clean){ return; }
+      if(seen[clean]){ return; }
+      seen[clean] = 1; phrases.push(clean);
+      var inPhrase = {};
+      words.forEach(function(w){ if(stop){ if(STOP[w]){ return; } } if(!inPhrase[w]){ inPhrase[w] = 1; freq[w] = (freq[w] || 0) + 1; } });
+    });
+    var words = Object.keys(freq).sort(function(a, b){ return freq[b] - freq[a] || a.localeCompare(b); });
+    var backend = [], left = [];
+    words.forEach(function(w){
+      if(titleWords[w]){ return; }
+      if(NOBACK[w]){ return; }
+      if(/^\d+$/.test(w)){ return; }
+      var cand = backend.concat([w]).join(' ');
+      if(bytes(cand) <= 249){ backend.push(w); } else { left.push(w); }
+    });
+    lastBackend = backend.join(' '); lastPhrases = phrases;
+    var b = bytes(lastBackend);
+    $('tmc-p-backend').textContent = lastBackend || '(nothing left after removing title words)';
+    $('tmc-p-bytes').textContent = b + ' / 249 bytes';
+    $('tmc-p-left').textContent = left.length ? left.length + ' words did not fit: ' + left.slice(0, 30).join(' ') + (left.length > 30 ? '...' : '') + '. Put the important ones in bullets.' : (words.length ? 'Every unique word fits. Words already in your title were skipped, since Amazon indexes the title anyway.' : '');
+    $('tmc-p-phrases').textContent = phrases.join('\n');
+    $('tmc-p-pc').textContent = phrases.length + ' unique';
+    $('tmc-p-freq').innerHTML = words.slice(0, 40).map(function(w){ return '<span class="tmc-chip' + (titleWords[w] ? ' t' : '') + '">' + esc(w) + ' ×' + freq[w] + '</span>'; }).join('');
+  }
+  ['tmc-p-in', 'tmc-p-brands', 'tmc-p-title', 'tmc-p-stop'].forEach(function(id){ $(id).addEventListener('input', processKw); $(id).addEventListener('change', processKw); });
+  $('tmc-p-copyb').addEventListener('click', function(){ copyText(lastBackend, this); });
+  $('tmc-p-copyp').addEventListener('click', function(){ copyText(lastPhrases.join('\n'), this); });
+  $('tmc-p-sendp').addEventListener('click', function(){ $('tmc-b-kws').value = lastPhrases.join('\n'); $('tmc-b-back').value = lastBackend; buildCheck(); show('build'); });
+
+  /* ---------- Listing Builder ---------- */
+  var BANNED = /[!$?_{}^¬¦]/;
+  function has(hay, phrase){ return (' ' + hay + ' ').indexOf(' ' + phrase + ' ') !== -1; }
+  function norm(s){ return ' ' + (s.toLowerCase().match(/[\p{L}\p{N}]+/gu) || []).join(' ') + ' '; }
+  function setCount(id, text, over){ $(id).textContent = text; $(id).className = 'tmc-count' + (over ? ' over' : ''); }
+  function buildCheck(){
+    var kws = lines($('tmc-b-kws').value.toLowerCase()).map(function(k){ return norm(k).trim(); }).filter(function(k){ return k; });
+    var brand = norm($('tmc-b-brand').value).trim();
+    var title = $('tmc-b-title').value.trim(), bul = $('tmc-b-bul').value.split('\n').map(function(x){ return x.trim(); }).filter(function(x){ return x; });
+    var desc = $('tmc-b-desc').value, back = $('tmc-b-back').value.trim();
+    var T = norm(title), B = norm(bul.join(' ') + ' ' + desc), K = norm(back), ALL = T + B + K;
+    setCount('tmc-b-tc', title.length + ' / 200 characters', title.length > 200);
+    var longest = bul.reduce(function(m, x){ return Math.max(m, x.length); }, 0);
+    setCount('tmc-b-bc', bul.length + ' bullets, longest ' + longest + ' characters', bul.length > 5);
+    setCount('tmc-b-kc', bytes(back) + ' / 249 bytes', bytes(back) > 249);
+    var got = 0, max = 0;
+    $('tmc-b-chips').innerHTML = kws.map(function(k, i){
+      var w = Math.max(1, kws.length - i); max += w;
+      var cls, words = k.split(' ');
+      if(has(T, k)){ cls = 't'; got += w; }
+      else if(has(B, k)){ cls = 'b'; got += w * 0.7; }
+      else if(words.every(function(x){ return has(ALL, x); })){ cls = 'p'; got += w * 0.4; }
+      else { cls = 'm'; }
+      return '<span class="tmc-chip ' + cls + '">' + esc(k) + '</span>';
+    }).join('');
+    var pct = max ? Math.round(got / max * 100) : 0;
+    $('tmc-b-score').textContent = pct + '%'; $('tmc-b-score').style.color = color(pct);
+
+    var checks = [];
+    function add(ok, text){ checks.push([ok, text]); }
+    add(title.length > 0 ? (title.length <= 200 ? (title.length <= 125 ? 2 : 1) : 0) : 0, title.length > 200 ? 'Title is over 200 characters. Amazon can suppress it.' : (title.length > 125 ? 'Title is ' + title.length + ' characters. Allowed, but mobile shows about 80, so lead with the main keyword.' : 'Title length is fine.'));
+    var first80 = norm(title.slice(0, 80));
+    if(kws.length){ add(has(first80, kws[0]) ? 2 : 0, has(first80, kws[0]) ? 'Your top keyword is in the first 80 characters.' : 'Put your top keyword "' + kws[0] + '" in the first 80 characters of the title.'); }
+    var counts = {}, rep = [];
+    (title.toLowerCase().match(/[\p{L}\p{N}]+/gu) || []).forEach(function(w){ if(STOP[w]){ return; } if(brand.split(' ').indexOf(w) !== -1){ return; } counts[w] = (counts[w] || 0) + 1; if(counts[w] === 3){ rep.push(w); } });
+    add(rep.length ? 0 : 2, rep.length ? 'Words used more than twice in the title: ' + rep.join(', ') + '. Amazon\'s title rules allow a word at most twice.' : 'No word repeated more than twice in the title.');
+    var bad = title.match(BANNED);
+    add(bad ? 0 : 2, bad ? 'Title contains "' + bad[0] + '". Amazon does not allow decorative special characters in titles.' : 'No banned special characters in the title.');
+    var promo = (title + ' ' + bul.join(' ')).match(/\b(best seller|bestseller|best|sale|free shipping|#1|top rated|guaranteed|discount|cheapest)\b/i);
+    add(promo ? 1 : 2, promo ? 'Avoid promotional words like "' + promo[0] + '". They can get the listing suppressed.' : 'No promotional claims found.');
+    add(bul.length === 5 ? 2 : (bul.length >= 3 ? 1 : 0), bul.length === 5 ? 'All 5 bullet points used.' : 'Use all 5 bullet points. Each one is a chance to cover keywords and objections.');
+    add(longest <= 250 ? 2 : 1, longest <= 250 ? 'Bullets are a readable length.' : 'Your longest bullet is ' + longest + ' characters. Mobile shoppers see much less, so put the benefit first.');
+    var dupWords = (back.toLowerCase().match(/[\p{L}\p{N}]+/gu) || []).filter(function(w){ return has(T, w); });
+    add(bytes(back) <= 249 ? (dupWords.length ? 1 : 2) : 0, bytes(back) > 249 ? 'Backend terms are over 249 bytes. Amazon may ignore the whole field.' : (dupWords.length ? 'Backend repeats title words (' + dupWords.slice(0, 6).join(', ') + '). Swap them for new terms: repeats add nothing.' : 'Backend terms fit and do not repeat the title.'));
+    add(/,/.test(back) ? 1 : 2, /,/.test(back) ? 'No need for commas in backend terms. Spaces are enough and save bytes.' : 'Backend uses spaces, good.');
+    checks.sort(function(a, b){ return a[0] - b[0]; });
+    $('tmc-b-checks').innerHTML = checks.map(function(c){ return '<li>' + (c[0] === 2 ? '<span class="tmc-ok">✓</span>' : (c[0] === 1 ? '<span class="tmc-mid">!</span>' : '<span class="tmc-no">✗</span>')) + '<span>' + esc(c[1]) + '</span></li>'; }).join('');
+  }
+  ['tmc-b-kws', 'tmc-b-brand', 'tmc-b-title', 'tmc-b-bul', 'tmc-b-desc', 'tmc-b-back'].forEach(function(id){ $(id).addEventListener('input', buildCheck); });
+
+  /* ---------- PPC ---------- */
+  function ppc(){
+    var price = num('tmc-c-price'), profit = num('tmc-c-profit'), cr = num('tmc-c-cr') / 100, keep = num('tmc-c-target');
+    var spend = num('tmc-c-spend'), adSales = num('tmc-c-adsales'), total = num('tmc-c-total');
+    var be = price > 0 ? profit / price : 0, tgt = price > 0 ? (profit - keep) / price : 0;
+    var k = [
+      ['Break-even ACoS', (be * 100).toFixed(1) + '%'],
+      ['Target ACoS', (tgt * 100).toFixed(1) + '%'],
+      ['Max cost per click, break-even', money(price * be * cr)],
+      ['Bid for your target profit', money(Math.max(0, price * tgt * cr))]
+    ];
+    var acos = adSales > 0 ? spend / adSales : null, tacos = total > 0 ? spend / total : null;
+    if(acos !== null){ k.push(['Your current ACoS', (acos * 100).toFixed(1) + '%']); }
+    if(tacos !== null){ k.push(['Your TACoS', (tacos * 100).toFixed(1) + '%']); }
+    if(acos !== null){ k.push(['Profit from ad orders, 30 days', money(adSales / Math.max(price, 0.01) * profit - spend)]); }
+    $('tmc-c-kpis').innerHTML = k.map(function(x){ return '<div class="tmc-kpi"><b>' + esc(x[1]) + '</b><span>' + esc(x[0]) + '</span></div>'; }).join('');
+    var v, s;
+    if(profit <= 0){ v = 'This product loses money before ads.'; s = 'Fix price or costs first. No ACoS will make it profitable.'; }
+    else if(acos === null){ v = 'Keep ACoS under ' + (be * 100).toFixed(1) + '% to break even.'; s = 'Add your ad spend and ad sales to see how you are doing.'; }
+    else if(acos <= tgt){ v = 'Ads are profitable at ' + (acos * 100).toFixed(1) + '% ACoS.'; s = 'You are under your target. You can raise bids on your best keywords to win more sales.'; }
+    else if(acos <= be){ v = 'Ads are breaking even or slightly profitable.'; s = 'Above your target but below break-even. Cut bids on keywords with high spend and no orders.'; }
+    else { v = 'Ads are losing money on each sale.'; s = 'ACoS is above break-even. That can be fine during a launch to build rank, but not for long. Lower bids and add negative keywords.'; }
+    if(tacos !== null){ s += ' TACoS of ' + (tacos * 100).toFixed(1) + '% shows ad spend against all sales: if it falls over time, ads are lifting your organic sales.'; }
+    $('tmc-c-verdict').textContent = v; $('tmc-c-sub').textContent = s;
+  }
+  ['tmc-c-price', 'tmc-c-profit', 'tmc-c-cr', 'tmc-c-target', 'tmc-c-spend', 'tmc-c-adsales', 'tmc-c-total'].forEach(function(id){ $(id).addEventListener('input', ppc); });
+
+  /* ---------- Reviews ---------- */
+  function rev(){
+    var avg = num('tmc-r-avg'), n = Math.max(0, Math.round(num('tmc-r-n'))), t = num('tmc-r-target');
+    var k = [];
+    if(t >= 5){ k.push(['5-star ratings needed', 'Not possible']); }
+    else if(avg >= t){ k.push(['5-star ratings needed', '0, already there']); }
+    else { k.push(['5-star ratings needed', String(Math.ceil((t * n - avg * n) / (5 - t)))]); }
+    var after1 = n > 0 ? (avg * n + 1) / (n + 1) : 1;
+    k.push(['Rating after one 1-star', after1.toFixed(2)]);
+    var fix1 = (avg - after1) > 0 ? Math.ceil(((avg * (n + 1)) - (avg * n + 1)) / (5 - avg)) : 0;
+    k.push(['5-stars to undo one 1-star', avg < 5 ? String(fix1) : '-']);
+    k.push(['Stars shown now', (Math.round(avg * 2) / 2).toFixed(1) + ' stars']);
+    $('tmc-r-kpis').innerHTML = k.map(function(x){ return '<div class="tmc-kpi"><b>' + esc(x[1]) + '</b><span>' + esc(x[0]) + '</span></div>'; }).join('');
+  }
+  ['tmc-r-avg', 'tmc-r-n', 'tmc-r-target'].forEach(function(id){ $(id).addEventListener('input', rev); });
+
+  /* ?kw= in the page link fills in and runs the finder */
+  var kwParam = location.search.match(/[?\x26]kw=([^\x26#]*)/);
+  if(kwParam){ try { $('tmc-f-seed').value = decodeURIComponent(kwParam[1].replace(/\+/g, ' ')); } catch(e) {} if($('tmc-f-seed').value){ $('tmc-f-go').click(); } }
+
+  processKw(); buildCheck(); ppc(); rev();
+})();
+</script>
