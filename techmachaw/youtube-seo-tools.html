@@ -1,0 +1,600 @@
+<!--
+  TechMachaw: Free YouTube SEO Tools (paste-in block)
+
+  HOW TO PASTE
+  1. WordPress > Pages > Add New. Title: "Free YouTube SEO Tools". Slug: youtube-seo-tools
+  2. Add a "Custom HTML" block and paste this whole file into it.
+  3. Preview. Every tool should work. Publish.
+
+  AFFILIATE LINK SWAPS (find and replace when your links are approved)
+  https://www.opus.pro/       ->  your OpusClip affiliate link   (Keyword Explorer)
+  https://publer.com/         ->  your Publer affiliate link     (Upload Optimizer)
+  https://www.canva.com/      ->  your Canva affiliate link      (Thumbnail Preview)
+  https://metricool.com/      ->  your Metricool affiliate link  (Outlier and Earnings)
+
+  DATA SOURCES (free, no API key, run in the visitor's browser)
+  - YouTube search suggestions: suggestqueries.google.com (JSONP)
+  - Video title and channel: noembed.com
+  - Thumbnails: i.ytimg.com
+  The script contains no bare ampersand characters, because WordPress escapes them and breaks the script.
+-->
+<style>
+.entry-header{display:none}
+#tmc-yt-tools{--a:#4F46E5;--ad:#3f37c9;--ink:#111827;--mut:#6b7280;--line:#e5e7eb;--soft:#f8f9fc;--good:#059669;--warn:#d97706;--bad:#dc2626;
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);font-size:16px;line-height:1.55;max-width:1080px;margin:0 auto}
+#tmc-yt-tools *{box-sizing:border-box}
+#tmc-yt-tools h1,#tmc-yt-tools h2,#tmc-yt-tools h3{font-family:Manrope,Inter,system-ui,sans-serif;font-weight:800;letter-spacing:-.02em;color:var(--ink);margin:0}
+#tmc-yt-tools h1{font-size:clamp(28px,5vw,40px);line-height:1.1}
+#tmc-yt-tools h2{font-size:22px}
+#tmc-yt-tools h3{font-size:16px}
+#tmc-yt-tools p{margin:0}
+#tmc-yt-tools .tmc-hero{display:flex;flex-direction:column;gap:10px;padding:8px 0 20px}
+#tmc-yt-tools .tmc-lead{color:var(--mut);max-width:62ch}
+#tmc-yt-tools .tmc-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px;padding:0;list-style:none}
+#tmc-yt-tools .tmc-tab{font:600 14px Inter,system-ui,sans-serif!important;padding:10px 14px!important;border-radius:10px!important;border:1px solid var(--line)!important;background:#fff!important;background-image:none!important;color:var(--ink)!important;box-shadow:none!important;cursor:pointer;text-transform:none!important;letter-spacing:0!important}
+#tmc-yt-tools .tmc-tab[aria-selected="true"]{background:var(--a)!important;border-color:var(--a)!important;color:#fff!important}
+#tmc-yt-tools .tmc-card{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 1px 2px rgba(16,24,40,.04);padding:20px;display:flex;flex-direction:column;gap:16px}
+#tmc-yt-tools .tmc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+#tmc-yt-tools .tmc-two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}
+#tmc-yt-tools label{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px;min-width:0}
+#tmc-yt-tools label small{font-weight:400;color:var(--mut)}
+#tmc-yt-tools input,#tmc-yt-tools textarea,#tmc-yt-tools select{font:400 15px Inter,system-ui,sans-serif;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%;min-width:0;margin:0}
+#tmc-yt-tools textarea{resize:vertical}
+#tmc-yt-tools input:focus,#tmc-yt-tools textarea:focus,#tmc-yt-tools select:focus{outline:2px solid var(--a);outline-offset:1px}
+#tmc-yt-tools .tmc-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+#tmc-yt-tools .tmc-row > label{flex:1 1 200px}
+#tmc-yt-tools .tmc-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font:600 15px Inter,system-ui,sans-serif!important;padding:11px 18px!important;border-radius:10px!important;border:1px solid var(--a)!important;background:var(--a)!important;background-image:none!important;color:#fff!important;box-shadow:none!important;cursor:pointer;text-decoration:none!important;text-transform:none!important;letter-spacing:0!important;line-height:1.2!important;white-space:nowrap}
+#tmc-yt-tools .tmc-btn:hover{background:var(--ad)!important;border-color:var(--ad)!important;color:#fff!important}
+#tmc-yt-tools .tmc-btn.tmc-ghost{background:#fff!important;color:var(--ink)!important;border:1px solid var(--line)!important}
+#tmc-yt-tools .tmc-btn.tmc-ghost:hover{background:var(--soft)!important;color:var(--ink)!important;border-color:#d1d5db!important}
+#tmc-yt-tools .tmc-btn.tmc-sm{padding:6px 10px!important;font-size:13px!important}
+#tmc-yt-tools .tmc-btn[disabled]{opacity:.6;cursor:progress}
+#tmc-yt-tools .tmc-note{font-size:13px;color:var(--mut)}
+#tmc-yt-tools .tmc-err{font-size:14px;color:var(--bad)}
+#tmc-yt-tools .tmc-table-wrap{overflow:auto;max-height:560px;border:1px solid var(--line);border-radius:12px}
+#tmc-yt-tools table{border-collapse:collapse;width:100%;font-size:14px;margin:0}
+#tmc-yt-tools th,#tmc-yt-tools td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+#tmc-yt-tools th{position:sticky;top:0;z-index:1;background:var(--soft);font-weight:600;font-size:13px;color:var(--mut);cursor:pointer;user-select:none}
+#tmc-yt-tools td.tmc-kw{white-space:normal;min-width:200px;font-weight:500}
+#tmc-yt-tools td.num{font-variant-numeric:tabular-nums}
+#tmc-yt-tools .tmc-meter{display:inline-block;width:56px;height:6px;border-radius:9px;background:var(--line);vertical-align:middle;margin-right:8px;overflow:hidden}
+#tmc-yt-tools .tmc-meter i{display:block;height:100%;border-radius:9px}
+#tmc-yt-tools .tmc-score{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+#tmc-yt-tools .tmc-big{font:800 48px/1 Manrope,Inter,sans-serif;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+#tmc-yt-tools .tmc-pill{display:inline-block;font:600 12px Inter,sans-serif;padding:3px 9px;border-radius:99px;border:1px solid currentColor}
+#tmc-yt-tools .tmc-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+#tmc-yt-tools .tmc-list li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;font-size:14px;margin:0}
+#tmc-yt-tools .tmc-list li b{font-weight:700}
+#tmc-yt-tools .tmc-ok{color:var(--good)} #tmc-yt-tools .tmc-mid{color:var(--warn)} #tmc-yt-tools .tmc-no{color:var(--bad)}
+#tmc-yt-tools .tmc-count{font-size:12px;color:var(--mut);font-variant-numeric:tabular-nums;font-weight:400}
+#tmc-yt-tools .tmc-chips{display:flex;flex-wrap:wrap;gap:6px}
+#tmc-yt-tools .tmc-chip{font:500 13px Inter,sans-serif!important;padding:5px 10px!important;border-radius:99px!important;border:1px solid var(--line)!important;background:var(--soft)!important;background-image:none!important;color:var(--ink)!important;box-shadow:none!important;cursor:pointer;text-transform:none!important}
+#tmc-yt-tools .tmc-chip:hover{border-color:var(--a)!important;color:var(--a)!important}
+#tmc-yt-tools .tmc-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+#tmc-yt-tools .tmc-kpi{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--soft);display:flex;flex-direction:column;gap:2px}
+#tmc-yt-tools .tmc-kpi b{font:800 22px Manrope,Inter,sans-serif;font-variant-numeric:tabular-nums}
+#tmc-yt-tools .tmc-kpi span{font-size:13px;color:var(--mut)}
+#tmc-yt-tools .tmc-cta{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:#eef2ff;border:1px solid #c7d2fe;color:#312e81;border-radius:12px;padding:14px 16px}
+#tmc-yt-tools .tmc-cta p{color:#312e81;font-size:14px;max-width:60ch}
+#tmc-yt-tools .tmc-cta b{color:#312e81}
+/* thumbnail mocks */
+#tmc-yt-tools .tmc-mock{border-radius:12px;padding:16px;border:1px solid var(--line);display:flex;flex-direction:column;gap:18px}
+#tmc-yt-tools .tmc-mock.dark{background:#0f0f0f;border-color:#0f0f0f}
+#tmc-yt-tools .tmc-mock.light{background:#fff}
+#tmc-yt-tools .tmc-feed{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+#tmc-yt-tools .tmc-v{display:flex;flex-direction:column;gap:8px;min-width:0}
+#tmc-yt-tools .tmc-th{position:relative;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#d1d5db;max-width:100%}
+#tmc-yt-tools .dark .tmc-th{background:#272727}
+#tmc-yt-tools .tmc-th img{width:100%;height:100%;object-fit:cover;display:block;max-width:none;margin:0}
+#tmc-yt-tools .tmc-dur{position:absolute;right:6px;bottom:6px;background:rgba(0,0,0,.8);color:#fff;font:600 12px Roboto,Arial,sans-serif;padding:1px 4px;border-radius:4px}
+#tmc-yt-tools .tmc-meta{display:grid;grid-template-columns:36px minmax(0,1fr);gap:10px}
+#tmc-yt-tools .tmc-av{width:36px;height:36px;border-radius:50%;background:#9ca3af}
+#tmc-yt-tools .tmc-t{font:500 15px/1.35 Roboto,Arial,sans-serif;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:#0f0f0f;margin:0}
+#tmc-yt-tools .dark .tmc-t{color:#f1f1f1}
+#tmc-yt-tools .tmc-c{font:400 13px Roboto,Arial,sans-serif;color:#606060;margin-top:2px}
+#tmc-yt-tools .dark .tmc-c{color:#aaa}
+#tmc-yt-tools .tmc-ghostcard .tmc-th,#tmc-yt-tools .tmc-ghostcard .tmc-av{opacity:.5}
+#tmc-yt-tools .tmc-ghostbar{height:12px;border-radius:6px;background:#e5e7eb;margin:3px 0}
+#tmc-yt-tools .dark .tmc-ghostbar{background:#272727}
+#tmc-yt-tools .tmc-mobile{max-width:380px;display:flex;flex-direction:column;gap:10px}
+#tmc-yt-tools .tmc-mobile .tmc-th{border-radius:0}
+#tmc-yt-tools .tmc-side{display:grid;grid-template-columns:168px minmax(0,1fr);gap:8px;max-width:420px}
+#tmc-yt-tools .tmc-side .tmc-th{border-radius:8px}
+#tmc-yt-tools .tmc-side .tmc-t{font-size:14px}
+#tmc-yt-tools .tmc-label{font:600 12px Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--mut)}
+#tmc-yt-tools .dark .tmc-label{color:#aaa}
+#tmc-yt-tools .tmc-foot{font-size:13px;color:var(--mut);margin-top:20px}
+#tmc-yt-tools [hidden]{display:none!important}
+@media (max-width:600px){
+  #tmc-yt-tools .tmc-two{grid-template-columns:minmax(0,1fr)}
+  #tmc-yt-tools .tmc-feed{grid-template-columns:minmax(0,1fr)}
+  #tmc-yt-tools .tmc-feed .tmc-ghostcard{display:none}
+  #tmc-yt-tools .tmc-card{padding:16px}
+  #tmc-yt-tools .tmc-side{grid-template-columns:140px minmax(0,1fr)}
+  #tmc-yt-tools .tmc-tab{flex:1 1 45%}
+}
+</style>
+
+<div id="tmc-yt-tools">
+  <div class="tmc-hero">
+    <h1>Free YouTube SEO Tools</h1>
+    <p class="tmc-lead">Find keywords people search on YouTube, score your title, description and tags before you upload, preview your thumbnail in the real feed, and check if a video is an outlier. No sign-up, no extension. Works like the keyword and SEO score features in paid tools like vidIQ or TubeBuddy.</p>
+  </div>
+
+  <div class="tmc-tabs" role="tablist">
+    <button type="button" class="tmc-tab" role="tab" id="tmc-tab-kw" aria-selected="true" data-p="kw">Keyword Explorer</button>
+    <button type="button" class="tmc-tab" role="tab" id="tmc-tab-seo" aria-selected="false" data-p="seo">Upload Optimizer</button>
+    <button type="button" class="tmc-tab" role="tab" id="tmc-tab-th" aria-selected="false" data-p="th">Thumbnail Preview</button>
+    <button type="button" class="tmc-tab" role="tab" id="tmc-tab-out" aria-selected="false" data-p="out">Outlier and Earnings</button>
+  </div>
+
+  <!-- KEYWORD EXPLORER -->
+  <section class="tmc-card" id="tmc-p-kw" role="tabpanel">
+    <div>
+      <h2>Keyword Explorer</h2>
+      <p class="tmc-note">Type a topic. We pull what people actually type into YouTube search and score each phrase.</p>
+    </div>
+    <div class="tmc-row">
+      <label for="tmc-kw-seed">Topic or keyword<input id="tmc-kw-seed" type="text" placeholder="e.g. hanuman chalisa, iphone 17 review, mutual funds" value=""></label>
+      <label for="tmc-kw-gl" style="flex:0 1 150px">Country<select id="tmc-kw-gl">
+        <option value="IN">India</option><option value="US">United States</option><option value="GB">United Kingdom</option><option value="CA">Canada</option><option value="AU">Australia</option><option value="AE">UAE</option><option value="PK">Pakistan</option><option value="BD">Bangladesh</option>
+      </select></label>
+      <label for="tmc-kw-hl" style="flex:0 1 130px">Language<select id="tmc-kw-hl">
+        <option value="en">English</option><option value="hi">Hindi</option><option value="ta">Tamil</option><option value="te">Telugu</option><option value="mr">Marathi</option><option value="bn">Bengali</option>
+      </select></label>
+      <button type="button" class="tmc-btn" id="tmc-kw-go">Find keywords</button>
+    </div>
+    <p class="tmc-note" id="tmc-kw-status"></p>
+    <div id="tmc-kw-out" hidden>
+      <div class="tmc-row" style="justify-content:space-between;align-items:center;margin-bottom:10px">
+        <p class="tmc-note" id="tmc-kw-sum"></p>
+        <div class="tmc-row">
+          <button type="button" class="tmc-btn tmc-ghost tmc-sm" id="tmc-kw-copy">Copy top 20</button>
+          <button type="button" class="tmc-btn tmc-ghost tmc-sm" id="tmc-kw-csv">Download CSV</button>
+        </div>
+      </div>
+      <div class="tmc-table-wrap">
+        <table>
+          <thead><tr><th data-k="kw">Keyword</th><th data-k="demand">Demand</th><th data-k="comp">Competition</th><th data-k="score">Score</th><th></th></tr></thead>
+          <tbody id="tmc-kw-body"></tbody>
+        </table>
+      </div>
+      <p class="tmc-note" style="margin-top:10px">Scores are estimates from YouTube search suggestions, not exact search volume. Demand rises when a phrase shows up high and often in suggestions. Competition is higher for short, broad phrases. Aim for a high Score: decent demand, lower competition.</p>
+    </div>
+    <div class="tmc-cta">
+      <p><b>Have one long video?</b> OpusClip cuts it into Shorts automatically, so you can target several of these keywords from one recording. Free plan available.</p>
+      <a class="tmc-btn" href="https://www.opus.pro/" target="_blank" rel="sponsored nofollow noopener">Try OpusClip free</a>
+    </div>
+  </section>
+
+  <!-- UPLOAD OPTIMIZER -->
+  <section class="tmc-card" id="tmc-p-seo" role="tabpanel" hidden>
+    <div>
+      <h2>Upload Optimizer</h2>
+      <p class="tmc-note">Paste your title, description and tags. You get a score out of 100 and a list of what to fix before you hit publish.</p>
+    </div>
+    <div class="tmc-two">
+      <div class="tmc-card" style="padding:0;border:0;box-shadow:none">
+        <div class="tmc-row">
+          <label for="tmc-seo-kw">Target keyword<input id="tmc-seo-kw" type="text" value="hanuman chalisa meaning"></label>
+          <label for="tmc-seo-type" style="flex:0 1 140px">Format<select id="tmc-seo-type"><option value="long">Long video</option><option value="short">Short</option></select></label>
+        </div>
+        <label for="tmc-seo-title">Title <span class="tmc-count" id="tmc-seo-tc"></span><input id="tmc-seo-title" type="text" value="Hanuman Chalisa Meaning: 5 Lines Most People Get Wrong"></label>
+        <label for="tmc-seo-desc">Description <span class="tmc-count" id="tmc-seo-dc"></span><textarea id="tmc-seo-desc" rows="7">Hanuman Chalisa meaning explained line by line, in simple Hindi and English. Most people recite it daily but miss what these 5 lines actually say.
+
+0:00 Why this matters
+0:42 Line 1: Jai Hanuman gyan gun sagar
+2:10 Line 7: Vidyavan guni ati chatur
+4:05 The line about Sanjeevani
+
+Subscribe for one story from the scriptures every day.
+
+#hanumanchalisa #hanuman #bhakti</textarea></label>
+        <label for="tmc-seo-tags">Tags <small>comma separated</small> <span class="tmc-count" id="tmc-seo-gc"></span><textarea id="tmc-seo-tags" rows="3">hanuman chalisa meaning, hanuman chalisa, hanuman chalisa in hindi, hanuman chalisa explained, hanuman ji, bajrang bali</textarea></label>
+        <div class="tmc-row">
+          <button type="button" class="tmc-btn tmc-ghost" id="tmc-seo-sug">Suggest tags from keyword</button>
+          <button type="button" class="tmc-btn tmc-ghost" id="tmc-seo-copy">Copy tags</button>
+        </div>
+        <div class="tmc-chips" id="tmc-seo-chips"></div>
+        <p class="tmc-note" id="tmc-seo-status"></p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;min-width:0">
+        <div class="tmc-score">
+          <span class="tmc-big" id="tmc-seo-score">0</span>
+          <div><span class="tmc-pill" id="tmc-seo-grade"></span><p class="tmc-note" style="margin-top:6px">SEO score out of 100</p></div>
+        </div>
+        <ul class="tmc-list" id="tmc-seo-list"></ul>
+      </div>
+    </div>
+    <div class="tmc-cta">
+      <p><b>Metadata ready?</b> Publer lets you upload and schedule YouTube videos with this title, description and tags, then post the same clip to Instagram and other platforms. Free plan available.</p>
+      <a class="tmc-btn" href="https://publer.com/" target="_blank" rel="sponsored nofollow noopener">Try Publer free</a>
+    </div>
+  </section>
+
+  <!-- THUMBNAIL PREVIEW -->
+  <section class="tmc-card" id="tmc-p-th" role="tabpanel" hidden>
+    <div>
+      <h2>Thumbnail Preview</h2>
+      <p class="tmc-note">See how your thumbnail and title look next to other videos on home, mobile and the suggested sidebar. Upload your own image or paste any YouTube link.</p>
+    </div>
+    <div class="tmc-row">
+      <label for="tmc-th-url">YouTube link <small>optional</small><input id="tmc-th-url" type="url" placeholder="https://www.youtube.com/watch?v=..."></label>
+      <button type="button" class="tmc-btn tmc-ghost" id="tmc-th-load">Load video</button>
+      <label for="tmc-th-file">Or upload your thumbnail<input id="tmc-th-file" type="file" accept="image/*"></label>
+    </div>
+    <div class="tmc-row">
+      <label for="tmc-th-title">Title<input id="tmc-th-title" type="text" value="Hanuman ji ne poora parvat kyun utha liya? The real story"></label>
+      <label for="tmc-th-chan" style="flex:0 1 200px">Channel name<input id="tmc-th-chan" type="text" value="MythicDevotion"></label>
+      <label for="tmc-th-dur" style="flex:0 1 100px">Length<input id="tmc-th-dur" type="text" value="8:24"></label>
+      <label for="tmc-th-mode" style="flex:0 1 120px">Theme<select id="tmc-th-mode"><option value="dark">Dark</option><option value="light">Light</option></select></label>
+    </div>
+    <p class="tmc-note" id="tmc-th-status"></p>
+    <p class="tmc-note" id="tmc-th-full" hidden></p>
+    <div class="tmc-mock dark" id="tmc-th-mock">
+      <span class="tmc-label">Home feed, desktop</span>
+      <div class="tmc-feed" id="tmc-th-feed"></div>
+      <div class="tmc-two">
+        <div style="display:flex;flex-direction:column;gap:10px;min-width:0"><span class="tmc-label">Mobile feed</span><div class="tmc-mobile" id="tmc-th-mob"></div></div>
+        <div style="display:flex;flex-direction:column;gap:10px;min-width:0"><span class="tmc-label">Suggested sidebar (smallest size)</span><div id="tmc-th-side"></div></div>
+      </div>
+    </div>
+    <p class="tmc-note" id="tmc-th-tips"></p>
+    <div class="tmc-cta">
+      <p><b>Thumbnail not popping?</b> Canva has YouTube thumbnail templates at the right 1280 x 720 size, with background remover and bold text styles. Free plan available.</p>
+      <a class="tmc-btn" href="https://www.canva.com/" target="_blank" rel="sponsored nofollow noopener">Design in Canva free</a>
+    </div>
+  </section>
+
+  <!-- OUTLIER AND EARNINGS -->
+  <section class="tmc-card" id="tmc-p-out" role="tabpanel" hidden>
+    <div>
+      <h2>Outlier and Earnings Calculator</h2>
+      <p class="tmc-note">Check if a video beat its channel's normal, the same idea as an outlier score, and estimate what it earned. Works for your videos or a competitor's (numbers are on the video and channel page).</p>
+    </div>
+    <div class="tmc-grid">
+      <label for="tmc-o-views">Video views<input id="tmc-o-views" type="number" min="0" value="185000"></label>
+      <label for="tmc-o-avg">Channel's usual views <small>median of last 10 videos</small><input id="tmc-o-avg" type="number" min="0" value="22000"></label>
+      <label for="tmc-o-subs">Channel subscribers<input id="tmc-o-subs" type="number" min="0" value="48000"></label>
+      <label for="tmc-o-days">Days since upload<input id="tmc-o-days" type="number" min="1" value="14"></label>
+      <label for="tmc-o-type">Format<select id="tmc-o-type"><option value="long">Long video</option><option value="short">Short</option></select></label>
+      <label for="tmc-o-geo">Main audience<select id="tmc-o-geo"><option value="in">India</option><option value="us">United States</option><option value="uk">UK / Europe</option><option value="mix">Global mix</option></select></label>
+      <label for="tmc-o-niche">Niche<select id="tmc-o-niche"><option value="fin">Finance, business</option><option value="tech">Tech, software</option><option value="edu">Education, how-to</option><option value="ent">Entertainment, vlogs</option><option value="dev" selected>Devotional, spiritual</option><option value="game">Gaming</option></select></label>
+      <label for="tmc-o-fx">USD to INR rate<input id="tmc-o-fx" type="number" min="1" step="0.1" value="88"></label>
+    </div>
+    <div>
+      <h3 id="tmc-o-verdict" style="margin-bottom:4px"></h3>
+      <p class="tmc-note" id="tmc-o-sub"></p>
+    </div>
+    <div class="tmc-kpis" id="tmc-o-kpis"></div>
+    <p class="tmc-note">Earnings use typical creator RPM ranges (what you keep per 1,000 views after YouTube's share) for the audience and niche you picked. Real numbers vary a lot by season, watch time and ad formats. Only monetised channels earn this.</p>
+    <div class="tmc-cta">
+      <p><b>Want this for every video, automatically?</b> Metricool tracks your YouTube views, subscribers and best posts over time next to your other social accounts. Free plan available.</p>
+      <a class="tmc-btn" href="https://metricool.com/" target="_blank" rel="sponsored nofollow noopener">Try Metricool free</a>
+    </div>
+  </section>
+
+  <p class="tmc-foot">Some of the links on this page may be affiliate links, which means we may earn a commission if you upgrade later, at no extra cost to you. Keyword data comes from public YouTube search suggestions. TechMachaw is not affiliated with YouTube, vidIQ or TubeBuddy.</p>
+</div>
+
+<script>
+(function(){
+  var A = String.fromCharCode(38);
+  function $(id){ return document.getElementById(id); }
+  function esc(s){ return String(s).split(A).join(A+'amp;').replace(/</g,A+'lt;').replace(/>/g,A+'gt;').replace(/"/g,A+'quot;').replace(/'/g,A+'#39;'); }
+  function fmt(n){ if(!isFinite(n)){ return '-'; } return Math.round(n).toLocaleString('en-IN'); }
+  function copyText(t, btn){
+    var done = function(){ var o = btn.textContent; btn.textContent = 'Copied'; setTimeout(function(){ btn.textContent = o; }, 1400); };
+    if(navigator.clipboard){ navigator.clipboard.writeText(t).then(done, function(){ fallbackCopy(t); done(); }); } else { fallbackCopy(t); done(); }
+  }
+  function fallbackCopy(t){ var ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch(e) {} document.body.removeChild(ta); }
+  function download(name, text, type){
+    var b = new Blob([text], {type: type}); var u = URL.createObjectURL(b); var a = document.createElement('a');
+    a.href = u; a.download = name; document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(u); a.remove(); }, 500);
+  }
+  function qs(obj){ var p = []; for(var k in obj){ if(obj.hasOwnProperty(k)){ p.push(k + '=' + encodeURIComponent(obj[k])); } } return p.join(A); }
+  function color(v){ return v >= 70 ? '#059669' : (v >= 45 ? '#d97706' : '#dc2626'); }
+  function invColor(v){ return v <= 40 ? '#059669' : (v <= 65 ? '#d97706' : '#dc2626'); }
+
+  /* ---------- tabs ---------- */
+  var tabs = document.querySelectorAll('#tmc-yt-tools .tmc-tab');
+  for(var i = 0; i < tabs.length; i++){
+    tabs[i].addEventListener('click', function(){
+      for(var j = 0; j < tabs.length; j++){
+        var on = tabs[j] === this;
+        tabs[j].setAttribute('aria-selected', on ? 'true' : 'false');
+        $('tmc-p-' + tabs[j].getAttribute('data-p')).hidden = !on;
+      }
+    });
+  }
+
+  /* ---------- YouTube suggestions via JSONP ---------- */
+  var cbn = 0;
+  function suggest(q, gl, hl, cb){
+    var name = 'tmcYtCb' + (++cbn) + '_' + Date.now();
+    var s = document.createElement('script'); var finished = false;
+    function finish(d){ if(finished){ return; } finished = true; try { delete window[name]; } catch(e) { window[name] = undefined; } if(s.parentNode){ s.parentNode.removeChild(s); } cb(d); }
+    window[name] = function(d){ var out = []; if(d){ if(d[1]){ for(var i = 0; i < d[1].length; i++){ out.push(String(d[1][i][0])); } } } finish(out); };
+    s.onerror = function(){ finish(null); };
+    setTimeout(function(){ finish(null); }, 7000);
+    s.src = 'https://suggestqueries.google.com/complete/search?' + qs({client: 'youtube', ds: 'yt', hl: hl, gl: gl, q: q, callback: name});
+    document.body.appendChild(s);
+  }
+  function runAll(queries, gl, hl, onEach, onDone){
+    var idx = 0, active = 0, left = queries.length, MAX = 6;
+    function next(){
+      while(active < MAX){
+        if(idx >= queries.length){ break; }
+        (function(q){ active++; suggest(q.q, gl, hl, function(res){ active--; left--; onEach(q, res); if(left === 0){ onDone(); } else { next(); } }); })(queries[idx++]);
+      }
+    }
+    if(!queries.length){ onDone(); } else { next(); }
+  }
+
+  /* ---------- Keyword Explorer ---------- */
+  var kwRows = [], kwSort = 'score';
+  function competition(k, seed){
+    var words = k.trim().split(/\s+/).length;
+    var c = words <= 1 ? 92 : words === 2 ? 80 : words === 3 ? 64 : words === 4 ? 48 : words === 5 ? 38 : 30;
+    if(/\b(20\d\d|for beginners|in hindi|in tamil|in telugu|explained|step by step|tutorial|kaise|kya hai)\b/i.test(k)){ c -= 10; }
+    if(k.toLowerCase() === seed.toLowerCase()){ c += 5; }
+    return Math.max(5, Math.min(99, c));
+  }
+  function renderKw(){
+    var rows = kwRows.slice().sort(function(a, b){ if(kwSort === 'kw'){ return a.kw.localeCompare(b.kw); } return b[kwSort] - a[kwSort]; });
+    rows = rows.slice(0, 100);
+    var h = '';
+    for(var i = 0; i < rows.length; i++){
+      var r = rows[i];
+      h += '<tr><td class="tmc-kw">' + esc(r.kw) + '</td>' +
+        '<td class="num"><span class="tmc-meter"><i style="width:' + r.demand + '%;background:' + color(r.demand) + '"></i></span>' + r.demand + '</td>' +
+        '<td class="num"><span class="tmc-meter"><i style="width:' + r.comp + '%;background:' + invColor(r.comp) + '"></i></span>' + r.comp + '</td>' +
+        '<td class="num"><b style="color:' + color(r.score) + '">' + r.score + '</b></td>' +
+        '<td><button type="button" class="tmc-btn tmc-ghost tmc-sm" data-kw="' + esc(r.kw) + '">Optimize</button></td></tr>';
+    }
+    $('tmc-kw-body').innerHTML = h;
+  }
+  $('tmc-kw-body').addEventListener('click', function(e){
+    var b = e.target.closest ? e.target.closest('button[data-kw]') : null;
+    if(!b){ return; }
+    $('tmc-seo-kw').value = b.getAttribute('data-kw');
+    $('tmc-tab-seo').click(); scoreSeo();
+    $('tmc-p-seo').scrollIntoView({behavior: 'smooth', block: 'start'});
+  });
+  var ths = document.querySelectorAll('#tmc-p-kw th[data-k]');
+  for(var t = 0; t < ths.length; t++){ ths[t].addEventListener('click', function(){ kwSort = this.getAttribute('data-k'); renderKw(); }); }
+
+  $('tmc-kw-go').addEventListener('click', function(){
+    var seed = $('tmc-kw-seed').value.trim().toLowerCase();
+    if(!seed){ $('tmc-kw-status').textContent = 'Type a topic first.'; return; }
+    var gl = $('tmc-kw-gl').value, hl = $('tmc-kw-hl').value;
+    var queries = [{q: seed, w: 1}];
+    var letters = 'abcdefghijklmnopqrstuvwxyz';
+    for(var i = 0; i < letters.length; i++){ queries.push({q: seed + ' ' + letters.charAt(i), w: 0.7}); }
+    var pre = ['how to ', 'best ', 'why ', 'what is ', 'top '];
+    for(var p = 0; p < pre.length; p++){ queries.push({q: pre[p] + seed, w: 0.8}); }
+    var map = {}, failed = 0, done = 0;
+    var btn = this; btn.disabled = true;
+    $('tmc-kw-status').textContent = 'Searching YouTube suggestions... 0 of ' + queries.length;
+    runAll(queries, gl, hl, function(q, res){
+      done++;
+      $('tmc-kw-status').textContent = 'Searching YouTube suggestions... ' + done + ' of ' + queries.length;
+      if(res === null){ failed++; return; }
+      for(var r = 0; r < res.length; r++){
+        var k = res[r].toLowerCase().trim(); if(!k){ continue; }
+        var pts = Math.round(q.w * (100 - r * 7));
+        if(!map[k]){ map[k] = {kw: k, best: 0, hits: 0}; }
+        map[k].hits++; if(pts > map[k].best){ map[k].best = pts; }
+      }
+    }, function(){
+      btn.disabled = false;
+      kwRows = [];
+      for(var k in map){
+        if(!map.hasOwnProperty(k)){ continue; }
+        var m = map[k];
+        var demand = Math.max(5, Math.min(100, m.best + (m.hits - 1) * 8));
+        var comp = competition(k, seed);
+        var score = Math.round(demand * 0.6 + (100 - comp) * 0.4);
+        kwRows.push({kw: k, demand: demand, comp: comp, score: score});
+      }
+      if(!kwRows.length){
+        $('tmc-kw-out').hidden = true;
+        $('tmc-kw-status').innerHTML = '<span class="tmc-err">' + (failed === queries.length ? 'Could not reach YouTube suggestions. Check your connection or ad blocker and try again.' : 'No suggestions found. Try a shorter or more common topic.') + '</span>';
+        return;
+      }
+      kwSort = 'score'; renderKw();
+      $('tmc-kw-out').hidden = false;
+      $('tmc-kw-status').textContent = '';
+      $('tmc-kw-sum').textContent = kwRows.length + ' keywords found for "' + seed + '"' + (kwRows.length > 100 ? ', showing the top 100 (CSV has all)' : '') + '. Click a column to sort. Click Optimize to score a title for that keyword.';
+    });
+  });
+  $('tmc-kw-seed').addEventListener('keydown', function(e){ if(e.key === 'Enter'){ $('tmc-kw-go').click(); } });
+  $('tmc-kw-copy').addEventListener('click', function(){
+    var rows = kwRows.slice().sort(function(a, b){ return b.score - a.score; }).slice(0, 20);
+    copyText(rows.map(function(r){ return r.kw; }).join('\n'), this);
+  });
+  $('tmc-kw-csv').addEventListener('click', function(){
+    var lines = ['keyword,demand,competition,score'];
+    kwRows.slice().sort(function(a, b){ return b.score - a.score; }).forEach(function(r){ lines.push('"' + r.kw.replace(/"/g, '""') + '",' + r.demand + ',' + r.comp + ',' + r.score); });
+    download('youtube-keywords-' + ($('tmc-kw-seed').value.trim().replace(/[^a-z0-9]+/gi, '-').toLowerCase() || 'export') + '.csv', lines.join('\n'), 'text/csv');
+  });
+
+  /* ---------- Upload Optimizer ---------- */
+  var POWER = /\b(secret|mistake|mistakes|wrong|truth|never|stop|why|how|best|worst|real|hidden|nobody|everyone|easy|fast|free|proven|actually|finally|complete|ultimate|shocking|untold|before|vs)\b/i;
+  function splitTags(s){ return s.split(',').map(function(x){ return x.trim(); }).filter(function(x){ return x.length > 0; }); }
+  function countOcc(hay, needle){ if(!needle){ return 0; } var c = 0, i = hay.indexOf(needle); while(i !== -1){ c++; i = hay.indexOf(needle, i + needle.length); } return c; }
+  function scoreSeo(){
+    var kw = $('tmc-seo-kw').value.trim().toLowerCase();
+    var title = $('tmc-seo-title').value;
+    var desc = $('tmc-seo-desc').value;
+    var tags = splitTags($('tmc-seo-tags').value);
+    var isShort = $('tmc-seo-type').value === 'short';
+    var tl = title.toLowerCase(), dl = desc.toLowerCase();
+    var tagChars = tags.join(',').length;
+    $('tmc-seo-tc').textContent = title.length + ' / 100';
+    $('tmc-seo-dc').textContent = desc.length + ' / 5000';
+    $('tmc-seo-gc').textContent = tagChars + ' / 500 characters, ' + tags.length + ' tags';
+    var checks = [];
+    function add(ok, pts, max, label, tip){ checks.push({ok: ok, pts: pts, max: max, label: label, tip: tip}); }
+    var kwWords = kw.split(/\s+/).filter(function(w){ return w.length > 2; });
+    var partial = kwWords.length ? kwWords.filter(function(w){ return tl.indexOf(w) !== -1; }).length / kwWords.length : 0;
+    // title
+    if(!kw){ add(0, 0, 18, 'Add a target keyword', 'Pick one phrase from the Keyword Explorer. Everything else is checked against it.'); }
+    else if(tl.indexOf(kw) !== -1){
+      var pos = tl.indexOf(kw);
+      add(pos <= 30 ? 2 : 1, pos <= 30 ? 18 : 12, 18, 'Keyword in title', pos <= 30 ? 'Exact keyword near the start. Good.' : 'Exact keyword is there but late. Move it into the first 30 characters.');
+    } else if(partial >= 0.6){ add(1, 9, 18, 'Keyword in title', 'Most keyword words are in the title but not the exact phrase. Use the exact phrase if it reads naturally.'); }
+    else { add(0, 0, 18, 'Keyword in title', 'The title does not contain your keyword. Put it in, ideally near the start.'); }
+    var L = title.length;
+    if(L >= 30){ if(L <= 70){ add(2, 12, 12, 'Title length (' + L + ' characters)', 'Fits without being cut off in search.'); } else { add(1, 6, 12, 'Title length (' + L + ' characters)', 'Over 70 characters gets cut off in search and on mobile. Trim it.'); } }
+    else { add(L > 0 ? 1 : 0, L > 0 ? 5 : 0, 12, 'Title length (' + L + ' characters)', 'Short titles waste space. Aim for 40 to 70 characters.'); }
+    var hook = (/\d/.test(title) ? 1 : 0) + (POWER.test(title) ? 1 : 0) + (/[?:(\[|]/.test(title) ? 1 : 0);
+    add(hook >= 2 ? 2 : (hook === 1 ? 1 : 0), hook >= 2 ? 8 : hook * 4, 8, 'Title hook', hook >= 2 ? 'Has a number, a strong word or a curiosity break.' : 'Add a number, a strong word (mistake, truth, why) or a curiosity break like a question or colon.');
+    var caps = title.replace(/[^A-Za-z]/g, ''); var capRatio = caps.length ? caps.replace(/[^A-Z]/g, '').length / caps.length : 0;
+    add(capRatio < 0.6 ? 2 : 0, capRatio < 0.6 ? 4 : 0, 4, 'Not all caps', capRatio < 0.6 ? 'Readable casing.' : 'All caps looks like spam. Capitalise one or two key words only.');
+    // description
+    var first = dl.slice(0, 150);
+    if(kw){ add(first.indexOf(kw) !== -1 ? 2 : (dl.indexOf(kw) !== -1 ? 1 : 0), first.indexOf(kw) !== -1 ? 12 : (dl.indexOf(kw) !== -1 ? 6 : 0), 12, 'Keyword in first 2 lines of description', first.indexOf(kw) !== -1 ? 'Shows above the "...more" fold. Good.' : 'Put the keyword in the first sentence. That part shows in search and above the fold.'); }
+    var occ = countOcc(dl, kw);
+    if(kw){ add(occ >= 2 ? (occ <= 5 ? 2 : 1) : (occ === 1 ? 1 : 0), occ >= 2 ? (occ <= 5 ? 6 : 3) : (occ === 1 ? 3 : 0), 6, 'Keyword repeated naturally (' + occ + ' times)', occ > 5 ? 'More than 5 times reads as keyword stuffing. Cut some.' : (occ >= 2 ? 'Good balance.' : 'Use the keyword or a close variation 2 to 3 times in the description.')); }
+    var words = desc.trim() ? desc.trim().split(/\s+/).length : 0;
+    var dmin = isShort ? 15 : 120;
+    add(words >= dmin ? 2 : (words >= dmin / 3 ? 1 : 0), words >= dmin ? 8 : (words >= dmin / 3 ? 4 : 0), 8, 'Description length (' + words + ' words)', words >= dmin ? 'Enough text for YouTube to understand the topic.' : (isShort ? 'Add a line or two describing the Short.' : 'Write at least 120 to 250 words: what the video covers, who it is for, related terms.'));
+    if(!isShort){
+      var stamps = desc.match(/(^|\n)\s*\d{1,2}:\d{2}/g) || [];
+      var zero = /(^|\n)\s*0?0:00/.test(desc);
+      add(stamps.length >= 3 ? (zero ? 2 : 1) : 0, stamps.length >= 3 ? (zero ? 8 : 4) : 0, 8, 'Chapters / timestamps', stamps.length >= 3 ? (zero ? 'Chapters will show. They can also appear as key moments in Google.' : 'Chapters need the first timestamp to be 0:00.') : 'Add at least 3 timestamps starting at 0:00 to get chapters.');
+    }
+    var hashtags = desc.match(/#[\wऀ-ॿ]+/g) || [];
+    add(hashtags.length >= 1 ? (hashtags.length <= 5 ? 2 : (hashtags.length <= 15 ? 1 : 0)) : 1, hashtags.length >= 1 ? (hashtags.length <= 5 ? 5 : (hashtags.length <= 15 ? 3 : 0)) : 2, 5, 'Hashtags (' + hashtags.length + ')', hashtags.length > 15 ? 'Over 15 hashtags and YouTube ignores all of them.' : (hashtags.length >= 1 ? (hashtags.length <= 5 ? 'The first 3 show above your title.' : 'Fine, but only the first 3 show above the title.') : 'Add 2 or 3 hashtags. The first 3 appear above the title.'));
+    add(/subscribe|follow|comment|watch next|playlist/i.test(desc) ? 2 : 0, /subscribe|follow|comment|watch next|playlist/i.test(desc) ? 3 : 0, 3, 'Call to action', 'Point viewers to subscribe, comment or the next video.');
+    // tags
+    var firstTag = tags.length ? tags[0].toLowerCase() : '';
+    if(kw){ add(firstTag === kw ? 2 : (tags.some(function(x){ return x.toLowerCase() === kw; }) ? 1 : 0), firstTag === kw ? 6 : (tags.some(function(x){ return x.toLowerCase() === kw; }) ? 3 : 0), 6, 'Keyword as first tag', firstTag === kw ? 'Good.' : 'Make the exact keyword your first tag.'); }
+    add(tags.length >= 5 ? (tagChars <= 500 ? 2 : 0) : (tags.length ? 1 : 0), tags.length >= 5 ? (tagChars <= 500 ? 6 : 0) : (tags.length ? 3 : 0), 6, 'Tags (' + tags.length + ', ' + tagChars + ' of 500 characters)', tagChars > 500 ? 'YouTube allows 500 characters of tags. Remove some or it will not save.' : (tags.length >= 5 ? 'Good mix. Tags matter less than title and description, so do not overthink them.' : 'Add 5 to 12 tags: your keyword, variations and misspellings.'));
+    if(isShort){ add(/#shorts/i.test(title + ' ' + desc) ? 2 : 1, /#shorts/i.test(title + ' ' + desc) ? 4 : 2, 4, '#shorts', 'Optional now. Vertical videos under 3 minutes are Shorts automatically.'); }
+    var got = 0, max = 0;
+    checks.forEach(function(c){ got += c.pts; max += c.max; });
+    var score = max ? Math.round(got / max * 100) : 0;
+    $('tmc-seo-score').textContent = score;
+    $('tmc-seo-score').style.color = color(score);
+    var g = $('tmc-seo-grade');
+    g.textContent = score >= 85 ? 'Excellent' : (score >= 70 ? 'Good' : (score >= 50 ? 'Needs work' : 'Weak'));
+    g.style.color = color(score);
+    checks.sort(function(a, b){ return a.ok - b.ok; });
+    $('tmc-seo-list').innerHTML = checks.map(function(c){
+      var icon = c.ok === 2 ? '<span class="tmc-ok">✓</span>' : (c.ok === 1 ? '<span class="tmc-mid">!</span>' : '<span class="tmc-no">✗</span>');
+      return '<li>' + icon + '<span><b>' + esc(c.label) + '.</b> ' + esc(c.tip) + '</span></li>';
+    }).join('');
+  }
+  ['tmc-seo-kw', 'tmc-seo-title', 'tmc-seo-desc', 'tmc-seo-tags', 'tmc-seo-type'].forEach(function(id){ $(id).addEventListener('input', scoreSeo); });
+  $('tmc-seo-copy').addEventListener('click', function(){ copyText(splitTags($('tmc-seo-tags').value).join(', '), this); });
+  $('tmc-seo-sug').addEventListener('click', function(){
+    var kw = $('tmc-seo-kw').value.trim().toLowerCase();
+    if(!kw){ $('tmc-seo-status').textContent = 'Add a target keyword first.'; return; }
+    var btn = this; btn.disabled = true; $('tmc-seo-status').textContent = 'Fetching tag ideas...';
+    var qsList = [{q: kw}, {q: kw + ' in'}, {q: kw + ' for'}, {q: kw.split(' ').slice(0, 2).join(' ')}];
+    var seen = {}, list = [], failed = 0;
+    runAll(qsList, $('tmc-kw-gl').value, $('tmc-kw-hl').value, function(q, res){
+      if(res === null){ failed++; return; }
+      res.forEach(function(x){ x = x.toLowerCase(); if(!seen[x]){ seen[x] = 1; list.push(x); } });
+    }, function(){
+      btn.disabled = false;
+      var have = {}; splitTags($('tmc-seo-tags').value).forEach(function(x){ have[x.toLowerCase()] = 1; });
+      list = list.filter(function(x){ return !have[x]; }).slice(0, 24);
+      if(!list.length){ $('tmc-seo-status').innerHTML = '<span class="tmc-err">' + (failed === qsList.length ? 'Could not reach YouTube suggestions. Check your connection or ad blocker.' : 'No new tag ideas found.') + '</span>'; $('tmc-seo-chips').innerHTML = ''; return; }
+      $('tmc-seo-status').textContent = 'Click a tag to add it.';
+      $('tmc-seo-chips').innerHTML = list.map(function(x){ return '<button type="button" class="tmc-chip" data-tag="' + esc(x) + '">+ ' + esc(x) + '</button>'; }).join('');
+    });
+  });
+  $('tmc-seo-chips').addEventListener('click', function(e){
+    var b = e.target.closest ? e.target.closest('button[data-tag]') : null; if(!b){ return; }
+    var tags = splitTags($('tmc-seo-tags').value); tags.push(b.getAttribute('data-tag'));
+    $('tmc-seo-tags').value = tags.join(', '); b.remove(); scoreSeo();
+  });
+
+  /* ---------- Thumbnail Preview ---------- */
+  var thumbSrc = '';
+  function ytId(u){ var m = String(u).match(/(?:youtu\.be\/|v=|\/shorts\/|\/embed\/|\/live\/)([A-Za-z0-9_-]{11})/); return m ? m[1] : null; }
+  function placeholderThumb(){
+    var c = document.createElement('canvas'); c.width = 640; c.height = 360; var x = c.getContext('2d');
+    var g = x.createLinearGradient(0, 0, 640, 360); g.addColorStop(0, '#4F46E5'); g.addColorStop(1, '#0f172a');
+    x.fillStyle = g; x.fillRect(0, 0, 640, 360); x.fillStyle = '#fff'; x.font = '800 54px Manrope, Arial, sans-serif'; x.textAlign = 'center';
+    x.fillText('Your thumbnail', 320, 175); x.font = '500 26px Inter, Arial, sans-serif'; x.fillText('Upload an image or paste a link', 320, 225);
+    return c.toDataURL('image/png');
+  }
+  function card(cls, src, title, chan, dur, extra){
+    return '<div class="tmc-v ' + cls + '"><div class="tmc-th">' + (src ? '<img alt="" src="' + esc(src) + '">' : '') + (dur ? '<span class="tmc-dur">' + esc(dur) + '</span>' : '') + '</div>' +
+      '<div class="tmc-meta"><div class="tmc-av"></div><div>' + (title ? '<p class="tmc-t">' + esc(title) + '</p><p class="tmc-c">' + esc(chan) + ' · ' + extra + '</p>' : '<div class="tmc-ghostbar"></div><div class="tmc-ghostbar" style="width:60%"></div>') + '</div></div></div>';
+  }
+  function renderThumb(){
+    var src = thumbSrc || placeholderThumb();
+    var t = $('tmc-th-title').value, ch = $('tmc-th-chan').value || 'Your channel', d = $('tmc-th-dur').value;
+    var mode = $('tmc-th-mode').value;
+    $('tmc-th-mock').className = 'tmc-mock ' + mode;
+    $('tmc-th-feed').innerHTML = card('tmc-ghostcard', '', '', '', '', '') + card('', src, t, ch, d, '12K views · 1 day ago') + card('tmc-ghostcard', '', '', '', '', '');
+    $('tmc-th-mob').innerHTML = card('', src, t, ch, d, '12K views');
+    $('tmc-th-side').innerHTML = '<div class="tmc-side"><div class="tmc-th"><img alt="" src="' + esc(src) + '">' + (d ? '<span class="tmc-dur">' + esc(d) + '</span>' : '') + '</div><div><p class="tmc-t">' + esc(t) + '</p><p class="tmc-c">' + esc(ch) + '</p></div></div>';
+    var tips = [];
+    if(t.length > 60){ tips.push('Your title is ' + t.length + ' characters. On home it shows about 2 lines, so the end may be cut. Put the hook in the first 50 characters.'); }
+    tips.push('Check the sidebar version: if you cannot read the thumbnail text at that size, use fewer words (3 or less) and bigger letters.');
+    tips.push('Thumbnail and title should say different things. The thumbnail shows the moment, the title adds the context.');
+    $('tmc-th-tips').innerHTML = tips.map(function(x){ return '• ' + esc(x); }).join('<br>');
+  }
+  ['tmc-th-title', 'tmc-th-chan', 'tmc-th-dur', 'tmc-th-mode'].forEach(function(id){ $(id).addEventListener('input', renderThumb); });
+  $('tmc-th-file').addEventListener('change', function(){
+    var f = this.files ? this.files[0] : null; if(!f){ return; }
+    var r = new FileReader(); r.onload = function(){ thumbSrc = r.result; $('tmc-th-status').textContent = ''; renderThumb(); }; r.readAsDataURL(f);
+  });
+  $('tmc-th-load').addEventListener('click', function(){
+    var id = ytId($('tmc-th-url').value);
+    if(!id){ $('tmc-th-status').innerHTML = '<span class="tmc-err">That does not look like a YouTube video link.</span>'; return; }
+    var hi = 'https://i.ytimg.com/vi/' + id + '/maxresdefault.jpg', mid = 'https://i.ytimg.com/vi/' + id + '/hqdefault.jpg';
+    var img = new Image();
+    img.onload = function(){ thumbSrc = (img.naturalWidth > 200) ? hi : mid; renderThumb(); };
+    img.onerror = function(){ thumbSrc = mid; renderThumb(); };
+    img.src = hi;
+    $('tmc-th-full').hidden = false;
+    $('tmc-th-full').innerHTML = 'Full-size thumbnail: <a href="' + hi + '" target="_blank" rel="noopener">open HD image</a> (right-click to save).';
+    $('tmc-th-status').textContent = 'Loading video details...';
+    fetch('https://noembed.com/embed?url=' + encodeURIComponent('https://www.youtube.com/watch?v=' + id)).then(function(r){ return r.json(); }).then(function(d){
+      if(d){ if(d.title){ $('tmc-th-title').value = d.title; } if(d.author_name){ $('tmc-th-chan').value = d.author_name; } }
+      $('tmc-th-status').textContent = ''; renderThumb();
+    }, function(){ $('tmc-th-status').textContent = 'Thumbnail loaded. Could not fetch the title, so type it in.'; renderThumb(); });
+  });
+
+  /* ---------- Outlier and Earnings ---------- */
+  var RPM = {in: [0.3, 1.2], us: [3, 8], uk: [2.5, 6], mix: [1, 3]};
+  var NICHE = {fin: 2.2, tech: 1.4, edu: 1.2, ent: 0.7, dev: 0.6, game: 0.6};
+  var SHORTS = {in: [0.01, 0.03], us: [0.04, 0.08], uk: [0.03, 0.06], mix: [0.02, 0.05]};
+  function num(id){ var v = parseFloat($(id).value); return isFinite(v) ? v : 0; }
+  function money(usd, fx){ return '$' + (usd < 100 ? usd.toFixed(usd < 10 ? 2 : 0) : fmt(usd)) + ' / ₹' + fmt(usd * fx); }
+  function calcOut(){
+    var v = num('tmc-o-views'), avg = num('tmc-o-avg'), subs = num('tmc-o-subs'), days = Math.max(1, num('tmc-o-days')), fx = num('tmc-o-fx') || 88;
+    var geo = $('tmc-o-geo').value, nic = $('tmc-o-niche').value, isShort = $('tmc-o-type').value === 'short';
+    var mult = avg ? v / avg : 0;
+    var lo, hi;
+    if(isShort){ lo = SHORTS[geo][0]; hi = SHORTS[geo][1]; } else { lo = RPM[geo][0] * NICHE[nic]; hi = RPM[geo][1] * NICHE[nic]; }
+    var eLo = v / 1000 * lo, eHi = v / 1000 * hi;
+    var verdict, sub;
+    if(!avg){ verdict = 'Add the channel\'s usual views'; sub = 'Open the channel, look at the last 10 videos and take the middle number.'; }
+    else if(mult >= 10){ verdict = 'Breakout: ' + mult.toFixed(1) + 'x the channel\'s normal'; sub = 'Very rare. Study the title, thumbnail and first 30 seconds closely and make your own take on the topic.'; }
+    else if(mult >= 3){ verdict = 'Outlier: ' + mult.toFixed(1) + 'x the channel\'s normal'; sub = 'This topic or packaging clearly worked. Worth copying the idea, not the video.'; }
+    else if(mult >= 1.3){ verdict = 'Above normal: ' + mult.toFixed(1) + 'x'; sub = 'Did well, but not a standout. Look for videos at 3x or more for stronger ideas.'; }
+    else { verdict = 'Normal or below: ' + mult.toFixed(1) + 'x'; sub = 'Nothing special here. The topic is probably not the reason for the views.'; }
+    $('tmc-o-verdict').textContent = verdict; $('tmc-o-sub').textContent = sub;
+    var k = [
+      ['Outlier score', avg ? mult.toFixed(1) + 'x' : '-'],
+      ['Views per subscriber', subs ? (v / subs).toFixed(2) : '-'],
+      ['Views per day', fmt(v / days)],
+      ['RPM range used', '$' + lo.toFixed(2) + ' to $' + hi.toFixed(2)],
+      ['Estimated earnings, low', money(eLo, fx)],
+      ['Estimated earnings, high', money(eHi, fx)]
+    ];
+    $('tmc-o-kpis').innerHTML = k.map(function(x){ return '<div class="tmc-kpi"><b>' + esc(x[1]) + '</b><span>' + esc(x[0]) + '</span></div>'; }).join('');
+  }
+  ['tmc-o-views', 'tmc-o-avg', 'tmc-o-subs', 'tmc-o-days', 'tmc-o-type', 'tmc-o-geo', 'tmc-o-niche', 'tmc-o-fx'].forEach(function(id){ $(id).addEventListener('input', calcOut); });
+
+  scoreSeo(); renderThumb(); calcOut();
+})();
+</script>
