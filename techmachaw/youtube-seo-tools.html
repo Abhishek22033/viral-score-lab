@@ -596,5 +596,12 @@ Subscribe for one story from the scriptures every day.
   ['tmc-o-views', 'tmc-o-avg', 'tmc-o-subs', 'tmc-o-days', 'tmc-o-type', 'tmc-o-geo', 'tmc-o-niche', 'tmc-o-fx'].forEach(function(id){ $(id).addEventListener('input', calcOut); });
 
   scoreSeo(); renderThumb(); calcOut();
+
+  /* ?kw=topic in the page link (from the Trending Searches page) fills in and runs Keyword Explorer */
+  var kwParam = location.search.match(/[?\x26]kw=([^\x26#]*)/);
+  if(kwParam){
+    try { $('tmc-kw-seed').value = decodeURIComponent(kwParam[1].replace(/\+/g, ' ')); } catch(e) {}
+    if($('tmc-kw-seed').value){ $('tmc-kw-go').click(); }
+  }
 })();
 </script>

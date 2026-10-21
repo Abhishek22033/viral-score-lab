@@ -1,0 +1,42 @@
+name: Update trending searches
+
+# Every hour: fetch Google trending searches for each country, merge with the
+# last 7 days, and publish trends.json on the trends-data branch.
+# The website reads it from:
+#   https://raw.githubusercontent.com/Abhishek22033/viral-score-lab/trends-data/trends.json
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: trends
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get previous data
+        run: |
+          git fetch --depth 1 origin trends-data && git show origin/trends-data:trends.json > prev.json || echo "" > prev.json
+
+      - name: Fetch trends
+        run: |
+          mkdir -p out
+          if [ -s prev.json ]; then python3 scripts/fetch_trends.py prev.json out/trends.json; else python3 scripts/fetch_trends.py '' out/trends.json; fi
+
+      - name: Publish to trends-data branch
+        run: |
+          cd out
+          git init -q -b trends-data
+          git config user.name "trends-bot"
+          git config user.email "trends-bot@users.noreply.github.com"
+          git add trends.json
+          git commit -q -m "Update trends $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" trends-data

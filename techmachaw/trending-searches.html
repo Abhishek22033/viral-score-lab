@@ -1,0 +1,291 @@
+<!--
+  TechMachaw: Trending Searches (paste-in block)
+
+  HOW TO PASTE
+  1. WordPress > Pages > Add New. Title: "Trending Searches". Slug: trending-searches
+  2. Add a "Custom HTML" block and paste this whole file into it.
+  3. Preview, then publish.
+
+  WHERE THE DATA COMES FROM (free, no API key)
+  - Google trending searches for 12 countries, refreshed every hour by a free GitHub Action
+    in github.com/Abhishek22033/viral-score-lab (workflow "Update trending searches").
+    It saves the last 7 days to:
+    https://raw.githubusercontent.com/Abhishek22033/viral-score-lab/trends-data/trends.json
+  - Wikipedia most-read pages: wikimedia.org pageviews API, read live in the browser.
+  - YouTube search suggestions: suggestqueries.google.com (JSONP), for content ideas.
+
+  AFFILIATE LINK SWAP (find and replace when approved)
+  https://publer.com/   ->  your Publer affiliate link
+
+  Links to /youtube-seo-tools/ assume that page's slug. Change them if yours differs.
+  The script contains no bare ampersand characters, because WordPress escapes them.
+-->
+<style>
+.entry-header{display:none}
+#tmc-trends{--a:#4F46E5;--ad:#3f37c9;--ink:#111827;--mut:#6b7280;--line:#e5e7eb;--soft:#f8f9fc;--hot:#dc2626;--good:#059669;
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);font-size:16px;line-height:1.55;max-width:1080px;margin:0 auto}
+#tmc-trends *{box-sizing:border-box}
+#tmc-trends h1,#tmc-trends h2,#tmc-trends h3{font-family:Manrope,Inter,system-ui,sans-serif;font-weight:800;letter-spacing:-.02em;color:var(--ink);margin:0}
+#tmc-trends h1{font-size:clamp(28px,5vw,40px);line-height:1.1}
+#tmc-trends h2{font-size:22px}
+#tmc-trends h3{font-size:17px;line-height:1.3}
+#tmc-trends p{margin:0}
+#tmc-trends .tmc-hero{display:flex;flex-direction:column;gap:10px;padding:8px 0 18px}
+#tmc-trends .tmc-lead{color:var(--mut);max-width:62ch}
+#tmc-trends .tmc-card{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 1px 2px rgba(16,24,40,.04);padding:20px;display:flex;flex-direction:column;gap:16px;margin-bottom:20px}
+#tmc-trends .tmc-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+#tmc-trends label{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px;min-width:0}
+#tmc-trends input,#tmc-trends select{font:400 15px Inter,system-ui,sans-serif;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%;min-width:0;margin:0}
+#tmc-trends input:focus,#tmc-trends select:focus{outline:2px solid var(--a);outline-offset:1px}
+#tmc-trends .tmc-seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;flex-wrap:wrap}
+#tmc-trends .tmc-seg button{font:600 14px Inter,system-ui,sans-serif!important;padding:10px 14px!important;border:0!important;border-right:1px solid var(--line)!important;border-radius:0!important;background:#fff!important;background-image:none!important;color:var(--ink)!important;box-shadow:none!important;cursor:pointer;text-transform:none!important;letter-spacing:0!important;margin:0!important}
+#tmc-trends .tmc-seg button:last-child{border-right:0!important}
+#tmc-trends .tmc-seg button[aria-pressed="true"]{background:var(--a)!important;color:#fff!important}
+#tmc-trends .tmc-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font:600 15px Inter,system-ui,sans-serif!important;padding:11px 18px!important;border-radius:10px!important;border:1px solid var(--a)!important;background:var(--a)!important;background-image:none!important;color:#fff!important;box-shadow:none!important;cursor:pointer;text-decoration:none!important;text-transform:none!important;letter-spacing:0!important;line-height:1.2!important;white-space:nowrap}
+#tmc-trends .tmc-btn:hover{background:var(--ad)!important;border-color:var(--ad)!important;color:#fff!important}
+#tmc-trends .tmc-btn.tmc-ghost{background:#fff!important;color:var(--ink)!important;border:1px solid var(--line)!important}
+#tmc-trends .tmc-btn.tmc-ghost:hover{background:var(--soft)!important;color:var(--ink)!important;border-color:#d1d5db!important}
+#tmc-trends .tmc-btn.tmc-sm{padding:6px 10px!important;font-size:13px!important}
+#tmc-trends .tmc-note{font-size:13px;color:var(--mut)}
+#tmc-trends .tmc-err{font-size:14px;color:var(--hot)}
+#tmc-trends .tmc-list{display:flex;flex-direction:column;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+#tmc-trends .tmc-item{display:grid;grid-template-columns:34px 56px minmax(0,1fr) auto;gap:14px;align-items:start;padding:14px 16px;border-bottom:1px solid var(--line);background:#fff}
+#tmc-trends .tmc-item:last-child{border-bottom:0}
+#tmc-trends .tmc-rank{font:800 18px Manrope,Inter,sans-serif;color:var(--mut);font-variant-numeric:tabular-nums;padding-top:2px}
+#tmc-trends .tmc-pic{width:56px;height:56px;border-radius:10px;object-fit:cover;background:var(--soft);display:block;margin:0;max-width:none}
+#tmc-trends .tmc-body{display:flex;flex-direction:column;gap:6px;min-width:0}
+#tmc-trends .tmc-tags{display:flex;flex-wrap:wrap;gap:6px}
+#tmc-trends .tmc-pill{display:inline-block;font:600 12px Inter,sans-serif;padding:3px 9px;border-radius:99px;background:var(--soft);border:1px solid var(--line);color:var(--mut);font-variant-numeric:tabular-nums}
+#tmc-trends .tmc-pill.hot{background:#fef2f2;border-color:#fecaca;color:#b91c1c}
+#tmc-trends .tmc-pill.new{background:#ecfdf5;border-color:#a7f3d0;color:#047857}
+#tmc-trends .tmc-pill.vol{background:#eef2ff;border-color:#c7d2fe;color:#3730a3}
+#tmc-trends .tmc-news{font-size:14px;color:var(--mut);overflow-wrap:anywhere}
+#tmc-trends .tmc-news a{color:var(--ink);text-decoration:underline;text-decoration-color:#d1d5db}
+#tmc-trends .tmc-acts{display:flex;flex-direction:column;gap:6px;align-items:stretch}
+#tmc-trends .tmc-ideas{grid-column:3 / -1;background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+#tmc-trends .tmc-ideas ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:14px}
+#tmc-trends .tmc-ideas li{margin:0}
+#tmc-trends .tmc-ideas b{font-weight:600}
+#tmc-trends .tmc-chips{display:flex;flex-wrap:wrap;gap:6px}
+#tmc-trends .tmc-chip{font:500 13px Inter,sans-serif;padding:4px 10px;border-radius:99px;border:1px solid var(--line);background:#fff;color:var(--ink)}
+#tmc-trends .tmc-wiki{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px;margin:0;padding:0;list-style:none}
+#tmc-trends .tmc-wiki li{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:8px;align-items:baseline;padding:8px 10px;border:1px solid var(--line);border-radius:10px;font-size:14px;margin:0}
+#tmc-trends .tmc-wiki li span:first-child{color:var(--mut);font-weight:700;font-variant-numeric:tabular-nums}
+#tmc-trends .tmc-wiki a{color:var(--ink);text-decoration:none;font-weight:500;overflow-wrap:anywhere}
+#tmc-trends .tmc-wiki a:hover{color:var(--a)}
+#tmc-trends .tmc-wiki em{font-style:normal;font-size:12px;color:var(--mut);font-variant-numeric:tabular-nums}
+#tmc-trends .tmc-cta{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:#eef2ff;border:1px solid #c7d2fe;color:#312e81;border-radius:12px;padding:14px 16px}
+#tmc-trends .tmc-cta p{color:#312e81;font-size:14px;max-width:60ch}
+#tmc-trends .tmc-cta b{color:#312e81}
+#tmc-trends .tmc-foot{font-size:13px;color:var(--mut);margin-top:4px}
+#tmc-trends [hidden]{display:none!important}
+@media (max-width:600px){
+  #tmc-trends .tmc-item{grid-template-columns:24px 44px minmax(0,1fr);gap:10px;padding:12px}
+  #tmc-trends .tmc-pic{width:44px;height:44px}
+  #tmc-trends .tmc-acts{grid-column:3 / -1;flex-direction:row;flex-wrap:wrap}
+  #tmc-trends .tmc-ideas{grid-column:1 / -1}
+  #tmc-trends .tmc-card{padding:16px}
+  #tmc-trends .tmc-seg{width:100%}
+  #tmc-trends .tmc-seg button{flex:1 1 30%}
+}
+</style>
+
+<div id="tmc-trends">
+  <div class="tmc-hero">
+    <h1>Trending Searches</h1>
+    <p class="tmc-lead">What people are searching on Google right now, in India and 11 other countries. Updated every hour, with the last 7 days kept so you can see what is rising and what lasted. Tap any trend for YouTube keywords and video ideas.</p>
+  </div>
+
+  <section class="tmc-card">
+    <div class="tmc-row">
+      <label for="tmc-tr-geo" style="flex:0 1 220px">Country<select id="tmc-tr-geo"></select></label>
+      <label for="tmc-tr-q" style="flex:1 1 220px">Filter<input id="tmc-tr-q" type="search" placeholder="e.g. cricket, iphone, election"></label>
+    </div>
+    <div class="tmc-seg" role="group" aria-label="View">
+      <button type="button" data-v="now" aria-pressed="true">Trending now</button>
+      <button type="button" data-v="rising" aria-pressed="false">New in last 6 hours</button>
+      <button type="button" data-v="week" aria-pressed="false">Biggest this week</button>
+    </div>
+    <p class="tmc-note" id="tmc-tr-status">Loading trends...</p>
+    <div class="tmc-list" id="tmc-tr-list" hidden></div>
+    <p class="tmc-note">Search counts are Google's own rounded estimates (for example "20K+"). "Trending for" counts the hourly checks a search stayed in the top list.</p>
+    <div class="tmc-cta">
+      <p><b>Trends fade in a day or two.</b> Publer lets you write the post once and schedule it to YouTube, Instagram, Facebook and X while the topic is still hot. Free plan available.</p>
+      <a class="tmc-btn" href="https://publer.com/" target="_blank" rel="sponsored nofollow noopener">Try Publer free</a>
+    </div>
+  </section>
+
+  <section class="tmc-card">
+    <div class="tmc-row" style="justify-content:space-between;align-items:center">
+      <div>
+        <h2>Most read on Wikipedia yesterday</h2>
+        <p class="tmc-note">Another strong signal: what people looked up to learn more about.</p>
+      </div>
+      <div class="tmc-seg" role="group" aria-label="Wikipedia language" id="tmc-wk-lang">
+        <button type="button" data-l="en" aria-pressed="true">English</button>
+        <button type="button" data-l="hi" aria-pressed="false">Hindi</button>
+      </div>
+    </div>
+    <p class="tmc-note" id="tmc-wk-status">Loading...</p>
+    <ol class="tmc-wiki" id="tmc-wk-list"></ol>
+  </section>
+
+  <p class="tmc-foot">Some of the links on this page may be affiliate links, which means we may earn a commission if you upgrade later, at no extra cost to you. Trend data from Google Trends and Wikimedia. TechMachaw is not affiliated with Google or Wikipedia.</p>
+</div>
+
+<script>
+(function(){
+  var A = String.fromCharCode(38);
+  var DATA = 'https://raw.githubusercontent.com/Abhishek22033/viral-score-lab/trends-data/trends.json';
+  var TOOLS = '/youtube-seo-tools/';
+  var root = document.getElementById('tmc-trends');
+  function $(id){ return document.getElementById(id); }
+  function esc(s){ return String(s == null ? '' : s).split(A).join(A+'amp;').replace(/</g,A+'lt;').replace(/>/g,A+'gt;').replace(/"/g,A+'quot;').replace(/'/g,A+'#39;'); }
+  function ago(iso){
+    if(!iso){ return ''; }
+    var m = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
+    if(m < 60){ return m + ' min ago'; }
+    var h = Math.round(m / 60); if(h < 48){ return h + 'h ago'; }
+    return Math.round(h / 24) + ' days ago';
+  }
+  function fmtNum(n){ return Number(n).toLocaleString('en-IN'); }
+
+  var data = null, view = 'now', geo = 'IN';
+  try { var g = (navigator.language || '').split('-')[1]; if(g){ geo = g.toUpperCase(); } } catch(e) {}
+
+  function itemsFor(){
+    var c = data.countries[geo]; if(!c){ return []; }
+    var q = $('tmc-tr-q').value.trim().toLowerCase();
+    var list = c.items.filter(function(i){ return q ? i.q.toLowerCase().indexOf(q) !== -1 : true; });
+    var now = Date.now();
+    if(view === 'now'){ list = list.filter(function(i){ return i.live; }); list.sort(function(a, b){ return b.peak - a.peak; }); }
+    else if(view === 'rising'){ list = list.filter(function(i){ return now - new Date(i.first).getTime() <= 6 * 3600000; }); list.sort(function(a, b){ return b.peak - a.peak; }); }
+    else { list.sort(function(a, b){ return (b.peak * Math.sqrt(b.hours || 1)) - (a.peak * Math.sqrt(a.hours || 1)); }); list = list.slice(0, 50); }
+    return list;
+  }
+
+  function render(){
+    if(!data){ return; }
+    var list = itemsFor();
+    var c = data.countries[geo];
+    $('tmc-tr-status').textContent = (c ? c.name : geo) + '. Updated ' + ago(data.updated) + '. ' + list.length + ' searches.';
+    if(!list.length){
+      $('tmc-tr-list').hidden = true;
+      $('tmc-tr-status').textContent += view === 'rising' ? ' Nothing new started in the last 6 hours.' : ' Nothing matches your filter.';
+      return;
+    }
+    var now = Date.now();
+    $('tmc-tr-list').innerHTML = list.map(function(i, k){
+      var fresh = now - new Date(i.first).getTime() <= 6 * 3600000;
+      var news = (i.news || [])[0];
+      return '<div class="tmc-item" data-q="' + esc(i.q) + '">' +
+        '<span class="tmc-rank">' + (k + 1) + '</span>' +
+        (i.pic ? '<img class="tmc-pic" alt="" loading="lazy" src="' + esc(i.pic) + '">' : '<span class="tmc-pic"></span>') +
+        '<div class="tmc-body"><h3>' + esc(i.q) + '</h3><div class="tmc-tags">' +
+          '<span class="tmc-pill vol">' + esc(i.peak_label || i.traffic) + ' searches</span>' +
+          (i.live ? '<span class="tmc-pill hot">Trending now</span>' : '') +
+          (fresh ? '<span class="tmc-pill new">New</span>' : '') +
+          '<span class="tmc-pill">Started ' + esc(ago(i.first)) + '</span>' +
+          ((i.hours || 1) > 1 ? '<span class="tmc-pill">Trending for ' + i.hours + 'h</span>' : '') +
+        '</div>' +
+        (news ? '<p class="tmc-news">' + esc(news.source) + ': <a href="' + esc(news.url) + '" target="_blank" rel="noopener nofollow">' + esc(news.title) + '</a></p>' : '') +
+        '</div>' +
+        '<div class="tmc-acts"><button type="button" class="tmc-btn tmc-sm" data-act="ideas">Video ideas</button>' +
+        '<a class="tmc-btn tmc-ghost tmc-sm" href="' + TOOLS + '?kw=' + encodeURIComponent(i.q) + '">YouTube keywords</a></div>' +
+        '</div>';
+    }).join('');
+    $('tmc-tr-list').hidden = false;
+  }
+
+  /* video ideas: angle templates plus live YouTube suggestions */
+  var cbn = 0;
+  function suggest(q, cb){
+    var name = 'tmcTrCb' + (++cbn) + '_' + Date.now(), s = document.createElement('script'), done = false;
+    function fin(v){ if(done){ return; } done = true; try { delete window[name]; } catch(e) { window[name] = undefined; } if(s.parentNode){ s.parentNode.removeChild(s); } cb(v); }
+    window[name] = function(d){ var out = []; if(d){ if(d[1]){ for(var i = 0; i < d[1].length; i++){ out.push(String(d[1][i][0])); } } } fin(out); };
+    s.onerror = function(){ fin(null); }; setTimeout(function(){ fin(null); }, 7000);
+    s.src = 'https://suggestqueries.google.com/complete/search?client=youtube' + A + 'ds=yt' + A + 'gl=' + encodeURIComponent(geo) + A + 'q=' + encodeURIComponent(q) + A + 'callback=' + name;
+    document.body.appendChild(s);
+  }
+  function title(s){ return s.replace(/\b\w/g, function(c){ return c.toUpperCase(); }); }
+  function ideas(q){
+    var T = title(q);
+    return [
+      ['Explainer (long video)', 'Why is everyone searching "' + T + '"? Explained in 5 minutes'],
+      ['Short (under 60 sec)', T + ': 3 things you need to know today'],
+      ['Impact angle', 'What ' + T + ' means for you'],
+      ['Opinion or reaction', 'My honest take on ' + T],
+      ['Search-friendly title', T + ' explained: full story, timeline and what happens next']
+    ];
+  }
+  $('tmc-tr-list').addEventListener('click', function(e){
+    var b = e.target.closest ? e.target.closest('button[data-act="ideas"]') : null; if(!b){ return; }
+    var row = b.closest('.tmc-item'); var q = row.getAttribute('data-q');
+    var open = row.querySelector('.tmc-ideas');
+    if(open){ open.remove(); b.textContent = 'Video ideas'; return; }
+    b.textContent = 'Hide ideas';
+    var box = document.createElement('div'); box.className = 'tmc-ideas';
+    box.innerHTML = '<ol>' + ideas(q).map(function(x){ return '<li><b>' + esc(x[0]) + ':</b> ' + esc(x[1]) + '</li>'; }).join('') + '</ol>' +
+      '<div><p class="tmc-note" style="margin-bottom:6px">What people type on YouTube about this:</p><div class="tmc-chips"><span class="tmc-note">Loading...</span></div></div>';
+    row.appendChild(box);
+    suggest(q, function(list){
+      var chips = box.querySelector('.tmc-chips');
+      if(list === null){ chips.innerHTML = '<span class="tmc-note">Could not load YouTube suggestions.</span>'; return; }
+      if(!list.length){ chips.innerHTML = '<span class="tmc-note">No YouTube searches yet. You could be early on this topic.</span>'; return; }
+      chips.innerHTML = list.slice(0, 10).map(function(x){ return '<span class="tmc-chip">' + esc(x) + '</span>'; }).join('');
+    });
+  });
+
+  /* controls */
+  var segs = root.querySelectorAll('.tmc-seg button[data-v]');
+  for(var i = 0; i < segs.length; i++){
+    segs[i].addEventListener('click', function(){
+      view = this.getAttribute('data-v');
+      for(var j = 0; j < segs.length; j++){ segs[j].setAttribute('aria-pressed', segs[j] === this ? 'true' : 'false'); }
+      render();
+    });
+  }
+  $('tmc-tr-geo').addEventListener('change', function(){ geo = this.value; render(); });
+  $('tmc-tr-q').addEventListener('input', render);
+
+  function boot(d){
+    data = d;
+    var sel = $('tmc-tr-geo'), keys = Object.keys(d.countries);
+    if(keys.indexOf(geo) === -1){ geo = 'IN'; }
+    sel.innerHTML = keys.map(function(k){ return '<option value="' + k + '"' + (k === geo ? ' selected' : '') + '>' + esc(d.countries[k].name) + '</option>'; }).join('');
+    render();
+  }
+  fetch(DATA + '?h=' + Math.floor(Date.now() / 600000)).then(function(r){ if(!r.ok){ throw new Error(r.status); } return r.json(); }).then(boot, function(){
+    if(window.TMC_TRENDS_SNAPSHOT){ boot(window.TMC_TRENDS_SNAPSHOT); $('tmc-tr-status').textContent += ' (saved snapshot)'; return; }
+    $('tmc-tr-status').innerHTML = '<span class="tmc-err">Could not load trends right now. Refresh the page in a minute.</span>';
+  });
+
+  /* Wikipedia most read */
+  var SKIP = /^(Main_Page|Special:|Wikipedia:|File:|Portal:|Help:|Talk:|Template:|Category:|User:|मुख्य_पृष्ठ|मुखपृष्ठ|विशेष:|विकिपीडिया:)/;
+  function pad(n){ return (n < 10 ? '0' : '') + n; }
+  function wiki(lang, back){
+    var d = new Date(Date.now() - back * 86400000);
+    var url = 'https://wikimedia.org/api/rest_v1/metrics/pageviews/top/' + lang + '.wikipedia/all-access/' + d.getUTCFullYear() + '/' + pad(d.getUTCMonth() + 1) + '/' + pad(d.getUTCDate());
+    $('tmc-wk-status').textContent = 'Loading...';
+    fetch(url).then(function(r){ if(!r.ok){ throw new Error(r.status); } return r.json(); }).then(function(j){
+      var arts = j.items[0].articles.filter(function(a){ return !SKIP.test(a.article); }).slice(0, 24);
+      $('tmc-wk-status').textContent = 'Page views on ' + d.toUTCString().slice(5, 16) + '.';
+      $('tmc-wk-list').innerHTML = arts.map(function(a, k){
+        var t = a.article.replace(/_/g, ' ');
+        return '<li><span>' + (k + 1) + '</span><a href="https://' + lang + '.wikipedia.org/wiki/' + encodeURIComponent(a.article) + '" target="_blank" rel="noopener">' + esc(t) + '</a><em>' + fmtNum(a.views) + '</em></li>';
+      }).join('');
+    }, function(){
+      if(back < 3){ wiki(lang, back + 1); return; }
+      $('tmc-wk-status').innerHTML = '<span class="tmc-err">Could not load Wikipedia data right now.</span>'; $('tmc-wk-list').innerHTML = '';
+    });
+  }
+  var wl = root.querySelectorAll('#tmc-wk-lang button');
+  for(var w = 0; w < wl.length; w++){
+    wl[w].addEventListener('click', function(){
+      for(var j = 0; j < wl.length; j++){ wl[j].setAttribute('aria-pressed', wl[j] === this ? 'true' : 'false'); }
+      wiki(this.getAttribute('data-l'), 1);
+    });
+  }
+  wiki('en', 1);
+})();
+</script>
